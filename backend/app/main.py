@@ -19,6 +19,21 @@ async def lifespan(app: FastAPI):
     logger.info("Initializing HireAI Database schema...")
     Base.metadata.create_all(bind=engine)
     logger.info("Database schema ready.")
+
+    try:
+        from app.database import SessionLocal
+        db = SessionLocal()
+        from app.models.user import User
+        if db.query(User).count() == 0:
+            logger.info("Auto-seeding database for Vercel deployment...")
+            from seed_admin import seed_admin_user
+            from seed_demo_data import seed_demo_dataset
+            seed_admin_user()
+            seed_demo_dataset()
+        db.close()
+    except Exception as e:
+        logger.warning(f"Database auto-seed note: {e}")
+
     yield
     logger.info("Shutting down HireAI API server.")
 
