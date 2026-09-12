@@ -20,11 +20,14 @@ ALLOWED_MIME_TYPES = {
     "application/octet-stream"  # Browser fallback sometimes
 }
 
-UPLOAD_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))), "uploads", "resumes")
+UPLOAD_DIR = "/tmp/uploads/resumes" if os.name != 'nt' else os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))), "uploads", "resumes")
 
 
 def ensure_upload_dir():
-    os.makedirs(UPLOAD_DIR, exist_ok=True)
+    try:
+        os.makedirs(UPLOAD_DIR, exist_ok=True)
+    except Exception:
+        pass
 
 
 async def process_resume_upload(db: Session, current_user: User, file: UploadFile) -> Resume:

@@ -84,10 +84,14 @@ app.include_router(ai_interview.router, prefix=settings.API_PREFIX)
 app.include_router(admin.router, prefix=settings.API_PREFIX)
 
 
-# Mount static uploads
-uploads_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "uploads")
-os.makedirs(uploads_dir, exist_ok=True)
-app.mount("/uploads", StaticFiles(directory=uploads_dir), name="uploads")
+# Mount static uploads safely for serverless environments
+uploads_dir = "/tmp/uploads" if os.name != 'nt' else os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "uploads")
+try:
+    os.makedirs(uploads_dir, exist_ok=True)
+    if os.path.exists(uploads_dir):
+        app.mount("/uploads", StaticFiles(directory=uploads_dir), name="uploads")
+except Exception as e:
+    logger.warning(f"Static uploads mount note: {e}")
 
 @app.get("/")
 def root_endpoint():
