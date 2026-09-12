@@ -1,4 +1,5 @@
 import logging
+import os
 from sqlalchemy import create_engine, text
 from sqlalchemy.exc import OperationalError, SQLAlchemyError
 from sqlalchemy.orm import declarative_base, sessionmaker

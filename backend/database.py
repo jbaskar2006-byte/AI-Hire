@@ -1,4 +1,5 @@
 import logging
+import os
 from sqlalchemy import create_engine, text
 from sqlalchemy.exc import OperationalError, SQLAlchemyError
 from sqlalchemy.orm import declarative_base, sessionmaker
@@ -41,7 +42,8 @@ def create_db_engine():
     except (OperationalError, SQLAlchemyError) as e:
         logger.error(f"Error connecting to primary MySQL database engine ({e}).")
         logger.warning("Initializing local SQLite fallback database for uninterrupted execution.")
-        fallback_url = "sqlite:///./hireai.db"
+        db_file = "/tmp/hireai.db" if os.name != 'nt' else "./hireai.db"
+        fallback_url = f"sqlite:///{db_file}"
         engine = create_engine(
             fallback_url,
             connect_args={"check_same_thread": False},
