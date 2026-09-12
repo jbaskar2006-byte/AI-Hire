@@ -1,0 +1,35 @@
+# Node dependencies
+node_modules/
+frontend/node_modules/
+
+# Production builds
+dist/
+frontend/dist/
+
+# Python Virtual Environment
+venv/
+backend/venv/
+*.venv
+
+# Python Cache & Bytecode
+__pycache__/
+backend/__pycache__/
+backend/app/__pycache__/
+backend/app/*/__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Environment & Secret files
+.env
+backend/.env
+
+# IDE & Editor files
+.vscode/
+.idea/
+*.swp
+
+# OS generated files
+Thumbs.db
+Desktop.ini
+.DS_Store
