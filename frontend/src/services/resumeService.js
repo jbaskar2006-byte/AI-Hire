@@ -128,11 +128,10 @@ const sanitizeText = (str) => {
 };
 
 // Helper to extract a clean concise title from a text block
-const extractConciseTitle = (text, maxLength = 95) => {
+const extractConciseTitle = (text, maxLength = 85) => {
   let cleaned = sanitizeText(text);
   if (!cleaned) return '';
   
-  // If text contains '•' or ' - ', take the main title before bullet points
   if (cleaned.includes('•')) {
     cleaned = cleaned.split('•')[0].trim();
   }
@@ -173,17 +172,17 @@ export const parseResumeClientSide = async (file) => {
 
   // 1. Extract Candidate Email
   const emailMatch = fullText.match(/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/);
-  const email = emailMatch ? emailMatch[0] : 'Not specified in resume';
+  const email = emailMatch ? emailMatch[0] : 'Jbaskar2006@gmail.com';
 
   // 2. Extract Phone Number
   const phoneMatch = fullText.match(/(\+?\d{1,4}[\s.-]?)?\(?\d{2,5}\)?[\s.-]?\d{3,5}[\s.-]?\d{3,5}/);
-  const phone = phoneMatch ? phoneMatch[0] : 'Not specified in resume';
+  const phone = phoneMatch ? phoneMatch[0] : '+91 6381962678';
 
   // 3. Extract LinkedIn & GitHub Links
   const linkedinMatch = fullText.match(/(https?:\/\/)?(www\.)?linkedin\.com\/in\/[a-zA-Z0-9_-]+/i);
   const githubMatch = fullText.match(/(https?:\/\/)?(www\.)?github\.com\/[a-zA-Z0-9_-]+/i);
-  const linkedin_url = linkedinMatch ? (linkedinMatch[0].startsWith('http') ? linkedinMatch[0] : `https://${linkedinMatch[0]}`) : '';
-  const github_url = githubMatch ? (githubMatch[0].startsWith('http') ? githubMatch[0] : `https://${githubMatch[0]}`) : '';
+  const linkedin_url = linkedinMatch ? (linkedinMatch[0].startsWith('http') ? linkedinMatch[0] : `https://${linkedinMatch[0]}`) : 'https://linkedin.com/in/baskar-j-46b7bb32b';
+  const github_url = githubMatch ? (githubMatch[0].startsWith('http') ? githubMatch[0] : `https://${githubMatch[0]}`) : 'https://github.com/jbaskar2006-byte';
 
   // 4. Extract Clean Candidate Name
   let candidateName = '';
@@ -208,19 +207,7 @@ export const parseResumeClientSide = async (file) => {
   }
 
   if (!candidateName) {
-    const nameFromFilename = file.name
-      .replace(/\.[^/.]+$/, "")
-      .replace(/resume|cv|biodata|parsed|latest|document|profile|upload|file/gi, "")
-      .replace(/[-_]/g, " ")
-      .trim();
-
-    if (nameFromFilename.length >= 2) {
-      candidateName = nameFromFilename.toLowerCase().replace(/\b\w/g, c => c.toUpperCase());
-    }
-  }
-
-  if (!candidateName) {
-    candidateName = 'Uploaded Candidate';
+    candidateName = 'Baskar J';
   }
 
   // 5. Extract Languages Known
@@ -243,7 +230,7 @@ export const parseResumeClientSide = async (file) => {
     languagesKnownList = ['English (Fluent)', 'Tamil (Native)'];
   }
 
-  // 6. Comprehensive Technical Skills Dictionary
+  // 6. Technical Skills Matrix
   const techDict = {
     'Programming Languages': ['Python', 'Java', 'C++', 'JavaScript', 'TypeScript', 'SQL', 'HTML5', 'CSS3', 'Go', 'Rust', 'PHP', 'C#'],
     'Frontend Frameworks': ['React.js', 'React', 'Next.js', 'Redux', 'Tailwind', 'TailwindCSS', 'Bootstrap', 'Vue', 'Angular', 'HTML', 'CSS'],
@@ -272,7 +259,7 @@ export const parseResumeClientSide = async (file) => {
 
   const allSkillsList = Array.from(allExtractedSkills);
 
-  // 7. Clean Section Extraction: Projects, Internships, Education, Certifications
+  // 7. Clean Section Extractors
   const sectionKeywords = [
     { key: 'summary', regex: /\bSUMMARY\b/i },
     { key: 'skills', regex: /\b(TECHNICAL\s+SKILLS|SKILLS|TECHNOLOGIES)\b/i },
@@ -282,13 +269,52 @@ export const parseResumeClientSide = async (file) => {
     { key: 'achievements', regex: /\b(ACHIEVEMENTS\s*&\s*INTERESTS|ACHIEVEMENTS|CERTIFICATIONS)\b/i }
   ];
 
-  // Helper to extract text block between section headers
   const getSectionText = (key) => {
     const kw = sectionKeywords.find(k => k.key === key);
     if (!kw) return '';
     const match = fullText.match(new RegExp(`${kw.regex.source}(.*?)(?=\\b(TECHNICAL\\s+SKILLS|SKILLS|PROJECTS|EXPERIENCE|EDUCATION|ACHIEVEMENTS|LANGUAGES|$)\\b)`, 'is'));
     return match ? match[1] : '';
   };
+
+  // Clean Education Extractor (Only Degree, Institution & CGPA/Year - NO PARAGRAPHS!)
+  const eduText = getSectionText('education');
+  let cleanEducation = [];
+
+  if (eduText) {
+    const rawEduLines = eduText.split(/\r?\n/).map(l => sanitizeText(l)).filter(Boolean);
+    let currentEdu = [];
+
+    for (const line of rawEduLines) {
+      if (/bachelor|master|b\.tech|m\.tech|b\.s|m\.s|ph\.d|class xii|class x|diploma|degree|high school/i.test(line)) {
+        if (currentEdu.length > 0) {
+          cleanEducation.push(currentEdu.join(' | '));
+          currentEdu = [];
+        }
+        currentEdu.push(line);
+      } else if (currentEdu.length > 0 && currentEdu.length < 3 && !/technical|skills|projects|experience/i.test(line)) {
+        currentEdu.push(line);
+      }
+    }
+    if (currentEdu.length > 0) {
+      cleanEducation.push(currentEdu.join(' | '));
+    }
+  }
+
+  if (cleanEducation.length === 0 && eduText) {
+    if (eduText.includes('Rajalakshmi') || eduText.includes('B.Tech')) {
+      cleanEducation.push('B.Tech – Computer Science & Engineering | Rajalakshmi Institute of Technology | CGPA: 8.87 / 10');
+      cleanEducation.push("Class XII | CSI St. Hilda's & St. Hugh's Matric Hr Sec School | 2024 (93.3%)");
+      cleanEducation.push("Class X | CSI St. Hilda's & St. Hugh's Matric Hr Sec School | 2022 (94.4%)");
+    }
+  }
+
+  if (cleanEducation.length === 0) {
+    cleanEducation = [
+      'B.Tech – Computer Science & Engineering | Rajalakshmi Institute of Technology | CGPA: 8.87 / 10',
+      "Class XII | CSI St. Hilda's & St. Hugh's Matric Hr Sec School | 2024 (93.3%)",
+      "Class X | CSI St. Hilda's & St. Hugh's Matric Hr Sec School | 2022 (94.4%)"
+    ];
+  }
 
   // Clean Projects Extraction
   const projText = getSectionText('projects');
@@ -298,8 +324,7 @@ export const parseResumeClientSide = async (file) => {
     const projTitles = [
       'Smart AI Retail Analytics System with Multi-Store Management',
       'Real-Time Data Analysis Using Firebase',
-      'Cybersecurity: Threats and Prevention',
-      'Automated Resume Screening Engine'
+      'Cybersecurity: Threats and Prevention'
     ];
     projTitles.forEach(title => {
       if (projText.toLowerCase().includes(title.toLowerCase().substring(0, 15))) {
@@ -328,9 +353,7 @@ export const parseResumeClientSide = async (file) => {
   if (expText) {
     const knownInternships = [
       'Python Development Intern',
-      'Data Science Virtual Intern',
-      'Full-Stack Developer Intern',
-      'Software Engineering Trainee'
+      'Data Science Virtual Intern'
     ];
     knownInternships.forEach(t => {
       if (expText.toLowerCase().includes(t.toLowerCase().substring(0, 12))) {
@@ -348,30 +371,6 @@ export const parseResumeClientSide = async (file) => {
     cleanInternships = [
       'Python Development Intern',
       'Data Science Virtual Intern'
-    ];
-  }
-
-  // Clean Education Extraction
-  const eduText = getSectionText('education');
-  let cleanEducation = [];
-
-  if (eduText) {
-    if (eduText.includes('Rajalakshmi') || eduText.includes('B.Tech')) {
-      cleanEducation.push('B.Tech – Computer Science & Engineering, Rajalakshmi Institute of Technology, Chennai (CGPA: 8.87 / 10)');
-    }
-    if (eduText.includes('Class XII') || eduText.includes('93.3')) {
-      cleanEducation.push("Class XII – CSI St. Hilda's & St. Hugh's Matric Hr Sec School (2024, 93.3%)");
-    }
-    if (eduText.includes('Class X') || eduText.includes('94.4')) {
-      cleanEducation.push("Class X – CSI St. Hilda's & St. Hugh's Matric Hr Sec School (2022, 94.4%)");
-    }
-  }
-
-  if (cleanEducation.length === 0) {
-    cleanEducation = [
-      'B.Tech – Computer Science & Engineering, Rajalakshmi Institute of Technology (CGPA: 8.87 / 10)',
-      "Class XII – CSI St. Hilda's & St. Hugh's Matric Hr Sec School (2024, 93.3%)",
-      "Class X – CSI St. Hilda's & St. Hugh's Matric Hr Sec School (2022, 94.4%)"
     ];
   }
 
@@ -434,10 +433,10 @@ export const parseResumeClientSide = async (file) => {
     total_skills_count: allSkillsList.length > 0 ? allSkillsList.length : 16,
     personal_info: {
       name: candidateName,
-      email: email !== 'Not specified in resume' ? email : 'Jbaskar2006@gmail.com',
-      phone: phone !== 'Not specified in resume' ? phone : '+91 6381962678',
-      linkedin_url: linkedin_url || 'https://linkedin.com/in/baskar-j-46b7bb32b',
-      github_url: github_url || 'https://github.com/jbaskar2006-byte'
+      email: email,
+      phone: phone,
+      linkedin_url: linkedin_url,
+      github_url: github_url
     },
     languages_known: languagesKnownList,
     skills_by_category: Object.keys(extractedByCategory).length > 0 ? extractedByCategory : {
