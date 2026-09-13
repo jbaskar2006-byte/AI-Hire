@@ -25,7 +25,6 @@ api.interceptors.request.use(
 const getMockResponse = (url, method, data) => {
   const lowerUrl = (url || '').toLowerCase();
 
-  // Parse request body data if present
   let reqData = {};
   if (data) {
     try {
@@ -35,7 +34,7 @@ const getMockResponse = (url, method, data) => {
     }
   }
 
-  // Active Job Database
+  // Diverse Active Job & Internship Database (10 Requisitions)
   const baseJobs = [
     {
       id: 101,
@@ -43,7 +42,7 @@ const getMockResponse = (url, method, data) => {
       company_name: 'TechCorp AI Labs',
       company: { name: 'TechCorp AI Labs', industry: 'Software & AI', location: 'Chennai, TN', website: 'https://techcorp.ai' },
       location: 'Chennai, TN (Hybrid)',
-      job_type: 'Full Time',
+      job_type: 'Full-Time',
       salary_range: '₹8,00,000 - ₹12,00,000',
       salary_min: 800000,
       salary_max: 1200000,
@@ -105,16 +104,170 @@ const getMockResponse = (url, method, data) => {
       status: 'active',
       applications_count: 18,
       created_at: new Date().toISOString()
+    },
+    {
+      id: 104,
+      title: 'Frontend Developer Intern (React)',
+      company_name: 'WebCraft Innovations',
+      company: { name: 'WebCraft Innovations', industry: 'Web Technologies', location: 'Chennai, TN', website: 'https://webcraft.dev' },
+      location: 'Chennai, TN',
+      job_type: 'Internship',
+      salary_range: '₹18,000 / month',
+      salary_min: 18000,
+      salary_max: 30000,
+      min_experience: 0,
+      description: 'Craft responsive, high-performance UI components using React.js, TailwindCSS, and JavaScript. Optimize web pages for maximum render speed.',
+      requirements: 'React.js, JavaScript, HTML5, CSS3, TailwindCSS, Redux',
+      skills: [
+        { skill_name: 'React.js', skill_type: 'required' },
+        { skill_name: 'JavaScript', skill_type: 'required' },
+        { skill_name: 'TailwindCSS', skill_type: 'preferred' }
+      ],
+      status: 'active',
+      applications_count: 31,
+      created_at: new Date().toISOString()
+    },
+    {
+      id: 105,
+      title: 'Backend Software Engineering Intern',
+      company_name: 'CloudScale Systems',
+      company: { name: 'CloudScale Systems', industry: 'Cloud & DevOps', location: 'Remote', website: 'https://cloudscale.io' },
+      location: 'Remote',
+      job_type: 'Internship',
+      salary_range: '₹22,000 / month',
+      salary_min: 22000,
+      salary_max: 38000,
+      min_experience: 0,
+      description: 'Architect RESTful APIs with Python FastAPI and Node.js. Implement PostgreSQL database models and Docker containerization.',
+      requirements: 'Python, FastAPI, Node.js, PostgreSQL, Docker, REST API',
+      skills: [
+        { skill_name: 'Python', skill_type: 'required' },
+        { skill_name: 'FastAPI', skill_type: 'required' },
+        { skill_name: 'PostgreSQL', skill_type: 'preferred' }
+      ],
+      status: 'active',
+      applications_count: 27,
+      created_at: new Date().toISOString()
+    },
+    {
+      id: 106,
+      title: 'Cybersecurity & Threat Analyst Intern',
+      company_name: 'SecureNet Shield',
+      company: { name: 'SecureNet Shield', industry: 'Cybersecurity', location: 'Chennai, TN', website: 'https://securenet.com' },
+      location: 'Chennai, TN',
+      job_type: 'Internship',
+      salary_range: '₹20,000 / month',
+      salary_min: 20000,
+      salary_max: 32000,
+      min_experience: 0,
+      description: 'Conduct vulnerability assessments, analyze malware threats, and research preventive cybersecurity measures for enterprise networks.',
+      requirements: 'Cybersecurity, Linux, Networking, Python, Threat Analysis',
+      skills: [
+        { skill_name: 'Cybersecurity', skill_type: 'required' },
+        { skill_name: 'Linux', skill_type: 'required' },
+        { skill_name: 'Python', skill_type: 'preferred' }
+      ],
+      status: 'active',
+      applications_count: 15,
+      created_at: new Date().toISOString()
+    },
+    {
+      id: 107,
+      title: 'AI & Machine Learning Specialist',
+      company_name: 'NeuralTech Solutions',
+      company: { name: 'NeuralTech Solutions', industry: 'Artificial Intelligence', location: 'Remote / Bangalore', website: 'https://neuraltech.ai' },
+      location: 'Remote / Hybrid',
+      job_type: 'Full-Time',
+      salary_range: '₹10,00,000 - ₹15,00,000',
+      salary_min: 1000000,
+      salary_max: 1500000,
+      min_experience: 2,
+      description: 'Train deep learning models, natural language processing pipelines, and automated document extraction engines using PyTorch and Scikit-Learn.',
+      requirements: 'Python, Machine Learning, PyTorch, TensorFlow, NLP, Scikit-Learn',
+      skills: [
+        { skill_name: 'Machine Learning', skill_type: 'required' },
+        { skill_name: 'PyTorch', skill_type: 'required' },
+        { skill_name: 'Python', skill_type: 'required' }
+      ],
+      status: 'active',
+      applications_count: 38,
+      created_at: new Date().toISOString()
+    },
+    {
+      id: 108,
+      title: 'DevOps & Cloud Engineer',
+      company_name: 'Infrastructure Cloud Labs',
+      company: { name: 'Infrastructure Cloud Labs', industry: 'Cloud Services', location: 'Chennai, TN', website: 'https://infracloud.io' },
+      location: 'Chennai, TN (Hybrid)',
+      job_type: 'Full-Time',
+      salary_range: '₹9,00,000 - ₹14,00,000',
+      salary_min: 900000,
+      salary_max: 1400000,
+      min_experience: 2,
+      description: 'Automate CI/CD pipelines, configure AWS cloud infrastructure, Docker containers, and Kubernetes clusters for web platforms.',
+      requirements: 'AWS, Docker, Kubernetes, Git, CI/CD, Nginx, Linux',
+      skills: [
+        { skill_name: 'AWS', skill_type: 'required' },
+        { skill_name: 'Docker', skill_type: 'required' },
+        { skill_name: 'Linux', skill_type: 'preferred' }
+      ],
+      status: 'active',
+      applications_count: 19,
+      created_at: new Date().toISOString()
+    },
+    {
+      id: 109,
+      title: 'Mobile App Developer (React Native)',
+      company_name: 'AppNexus Studio',
+      company: { name: 'AppNexus Studio', industry: 'Mobile Apps', location: 'Remote', website: 'https://appnexus.dev' },
+      location: 'Remote',
+      job_type: 'Full-Time',
+      salary_range: '₹7,00,000 - ₹11,00,000',
+      salary_min: 700000,
+      salary_max: 1100000,
+      min_experience: 1,
+      description: 'Build cross-platform iOS and Android mobile applications using React Native, Redux, and Firebase backend integration.',
+      requirements: 'React Native, JavaScript, TypeScript, Redux, Firebase, REST API',
+      skills: [
+        { skill_name: 'JavaScript', skill_type: 'required' },
+        { skill_name: 'React.js', skill_type: 'required' },
+        { skill_name: 'Firebase', skill_type: 'preferred' }
+      ],
+      status: 'active',
+      applications_count: 24,
+      created_at: new Date().toISOString()
+    },
+    {
+      id: 110,
+      title: 'Database & REST API Engineer',
+      company_name: 'DataGrid Enterprise',
+      company: { name: 'DataGrid Enterprise', industry: 'Database Systems', location: 'Chennai, TN', website: 'https://datagrid.com' },
+      location: 'Chennai, TN',
+      job_type: 'Full-Time',
+      salary_range: '₹8,00,000 - ₹13,00,000',
+      salary_min: 800000,
+      salary_max: 1300000,
+      min_experience: 1,
+      description: 'Design relational database schemas (MySQL, PostgreSQL), write complex SQL queries, and implement secure RESTful microservices.',
+      requirements: 'SQL, MySQL, PostgreSQL, Node.js, Express, Python, Redis',
+      skills: [
+        { skill_name: 'SQL', skill_type: 'required' },
+        { skill_name: 'MySQL', skill_type: 'required' },
+        { skill_name: 'Node.js', skill_type: 'preferred' }
+      ],
+      status: 'active',
+      applications_count: 21,
+      created_at: new Date().toISOString()
     }
   ];
 
-  // --- 1. AUTHENTICATION ENDPOINTS ---
+  // 1. AUTHENTICATION
   if (lowerUrl.includes('/auth/me')) {
     const saved = localStorage.getItem('hireai_user');
     return saved ? JSON.parse(saved) : { id: 1, full_name: 'Baskar J', email: 'Jbaskar2006@gmail.com', role: 'candidate' };
   }
 
-  // --- 2. CANDIDATE RESUME ENDPOINTS ---
+  // 2. RESUME ENDPOINTS
   if (lowerUrl.includes('/candidate/resume/latest') || (lowerUrl.includes('/candidate/resume') && method === 'get' && !lowerUrl.includes('/history'))) {
     const storedResume = localStorage.getItem('hireai_latest_resume');
     if (storedResume) {
@@ -135,7 +288,7 @@ const getMockResponse = (url, method, data) => {
     return { offline: true, message: 'Backend unavailable, client-side parsing required' };
   }
 
-  // --- 3. CANDIDATE APPLICATIONS ENDPOINTS ---
+  // 3. APPLICATIONS ENDPOINTS
   if (lowerUrl.includes('/applications')) {
     let storedApps = JSON.parse(localStorage.getItem('hireai_applications') || 'null');
     if (!storedApps) {
@@ -158,7 +311,6 @@ const getMockResponse = (url, method, data) => {
       localStorage.setItem('hireai_applications', JSON.stringify(storedApps));
     }
 
-    // Submit New Application (POST /applications/:jobId)
     if (method === 'post') {
       const urlParts = lowerUrl.split('/');
       const jobId = parseInt(urlParts[urlParts.length - 1]) || 101;
@@ -182,7 +334,6 @@ const getMockResponse = (url, method, data) => {
       return { status: 'success', message: 'Application submitted successfully!', application: newApp };
     }
 
-    // Withdraw Application (DELETE /applications/:id)
     if (method === 'delete') {
       const appId = parseInt(lowerUrl.split('/').pop());
       storedApps = storedApps.filter(a => a.id !== appId && a.job_id !== appId);
@@ -190,11 +341,10 @@ const getMockResponse = (url, method, data) => {
       return { status: 'success', message: 'Application withdrawn successfully' };
     }
 
-    // Return Candidate's Applications (GET /applications/my or GET /applications)
     return storedApps;
   }
 
-  // --- 4. JOBS BOARD ENDPOINTS ---
+  // 4. JOBS BOARD ENDPOINTS
   if (lowerUrl.includes('/jobs')) {
     const storedApps = JSON.parse(localStorage.getItem('hireai_applications') || '[]');
     const appliedJobIds = storedApps.map(a => a.job_id || a.job?.id);
@@ -204,72 +354,40 @@ const getMockResponse = (url, method, data) => {
       has_applied: appliedJobIds.includes(j.id)
     }));
 
-    // Single Job Detail (GET /jobs/:id)
     if (method === 'get' && lowerUrl.match(/\/jobs\/\d+/)) {
       const jobId = parseInt(lowerUrl.split('/').pop());
       const singleJob = jobsWithAppliedState.find(j => j.id === jobId) || jobsWithAppliedState[0];
       return singleJob;
     }
 
-    // Paginated Job Listing (GET /jobs)
     return {
       items: jobsWithAppliedState,
       total: jobsWithAppliedState.length,
       page: 1,
-      size: 9,
+      size: 12,
       pages: 1
     };
   }
 
-  // --- 5. AI RECOMMENDATIONS ENDPOINTS ---
+  // 5. AI RECOMMENDATIONS ENDPOINTS
   if (lowerUrl.includes('/ai/recommend-jobs') || lowerUrl.includes('/ai/recommendations')) {
     const storedApps = JSON.parse(localStorage.getItem('hireai_applications') || '[]');
     const appliedJobIds = storedApps.map(a => a.job_id || a.job?.id);
 
-    const recommendations = [
-      {
-        job_id: 101,
-        title: 'Full-Stack Developer',
-        company_name: 'TechCorp AI Labs',
-        location: 'Chennai, TN (Hybrid)',
-        job_type: 'Full Time',
-        min_experience: 1,
-        salary_min: 800000,
-        salary_max: 1200000,
-        match_score: 96.5,
-        skill_coverage: 95,
-        matched_skills: ['React.js', 'Python', 'Node.js', 'Express', 'MySQL', 'MongoDB'],
-        has_applied: appliedJobIds.includes(101)
-      },
-      {
-        job_id: 102,
-        title: 'Python Development Intern',
-        company_name: 'DataPulse Analytics',
-        location: 'Remote / Chennai',
-        job_type: 'Internship',
-        min_experience: 0,
-        salary_min: 25000,
-        salary_max: 40000,
-        match_score: 94.0,
-        skill_coverage: 92,
-        matched_skills: ['Python', 'REST API', 'MySQL', 'Git/GitHub'],
-        has_applied: appliedJobIds.includes(102)
-      },
-      {
-        job_id: 103,
-        title: 'Data Science Virtual Intern',
-        company_name: 'AI Vision Labs',
-        location: 'Remote',
-        job_type: 'Internship',
-        min_experience: 0,
-        salary_min: 20000,
-        salary_max: 35000,
-        match_score: 91.5,
-        skill_coverage: 88,
-        matched_skills: ['Python', 'SQL', 'Firebase', 'Data Analysis'],
-        has_applied: appliedJobIds.includes(103)
-      }
-    ];
+    const recommendations = baseJobs.slice(0, 6).map((j, idx) => ({
+      job_id: j.id,
+      title: j.title,
+      company_name: j.company_name,
+      location: j.location,
+      job_type: j.job_type,
+      min_experience: j.min_experience,
+      salary_min: j.salary_min,
+      salary_max: j.salary_max,
+      match_score: Math.max(85, 98 - (idx * 2.5)),
+      skill_coverage: Math.max(80, 96 - (idx * 3)),
+      matched_skills: j.skills.map(s => s.skill_name),
+      has_applied: appliedJobIds.includes(j.id)
+    }));
 
     return {
       recommendations: recommendations,
@@ -277,7 +395,37 @@ const getMockResponse = (url, method, data) => {
     };
   }
 
-  // --- 6. CANDIDATE PROFILE ENDPOINTS ---
+  // 6. INTERVIEW PRACTICE & ANSWER EVALUATOR ENDPOINT
+  if (lowerUrl.includes('/ai/interview-questions') || lowerUrl.includes('/interview/questions')) {
+    return {
+      job_id: 101,
+      job_title: 'Full-Stack Developer',
+      questions_by_category: {
+        'Technical': [
+          { id: 1, category: 'Technical', question: 'How do you design a scalable state management system in React for high-frequency updates?', sample_answer: 'Leverage Context API alongside localized component state or Zustand/Redux for domain state.' },
+          { id: 2, category: 'Technical', question: 'Explain how Node.js/Express handles non-blocking asynchronous IO operations.', sample_answer: 'Node.js utilizes libuv event loop and thread pool to delegate asynchronous IO operations efficiently.' }
+        ],
+        'HR': [
+          { id: 3, category: 'HR', question: 'Describe a situation where you had to debug a complex issue under tight project deadlines.', sample_answer: 'I prioritized systematic log tracing, isolated the root cause, and delivered an optimized fix.' }
+        ],
+        'Project': [
+          { id: 4, category: 'Project', question: 'Walk us through the architecture of your Smart AI Retail Analytics System project.', sample_answer: 'Designed a React frontend with Node.js/Express backend exposing REST APIs connected to MongoDB and MySQL databases.' }
+        ],
+        'Skill-Based': [
+          { id: 5, category: 'Skill-Based', question: 'How do you structure RESTful API endpoints and handle database query optimization in Python/Node?', sample_answer: 'Follow RESTful conventions, implement indexed queries, pagination, and caching layer with Redis.' }
+        ]
+      },
+      questions: [
+        { id: 1, category: 'Technical', question: 'How do you design a scalable state management system in React for high-frequency updates?' },
+        { id: 2, category: 'Technical', question: 'Explain how Node.js/Express handles non-blocking asynchronous IO operations.' },
+        { id: 3, category: 'HR', question: 'Describe a situation where you had to debug a complex issue under tight project deadlines.' },
+        { id: 4, category: 'Project', question: 'Walk us through the architecture of your Smart AI Retail Analytics System project.' },
+        { id: 5, category: 'Skill-Based', question: 'How do you structure RESTful API endpoints and handle database query optimization in Python/Node?' }
+      ]
+    };
+  }
+
+  // 7. CANDIDATE PROFILE ENDPOINTS
   if (lowerUrl.includes('/candidate/profile')) {
     if (method === 'put') {
       const existing = JSON.parse(localStorage.getItem('hireai_candidate_profile') || '{}');
@@ -306,7 +454,7 @@ const getMockResponse = (url, method, data) => {
     };
   }
 
-  // --- 7. CANDIDATE TECHNICAL SKILLS ENDPOINTS ---
+  // 8. TECHNICAL SKILLS ENDPOINTS
   if (lowerUrl.includes('/candidate/skills')) {
     let storedSkills = JSON.parse(localStorage.getItem('hireai_skills') || 'null');
     if (!storedSkills) {
@@ -333,13 +481,6 @@ const getMockResponse = (url, method, data) => {
       return newSkill;
     }
 
-    if (method === 'put') {
-      const skillId = parseInt(lowerUrl.split('/').pop());
-      storedSkills = storedSkills.map(s => s.id === skillId ? { ...s, ...reqData } : s);
-      localStorage.setItem('hireai_skills', JSON.stringify(storedSkills));
-      return reqData;
-    }
-
     if (method === 'delete') {
       const skillId = parseInt(lowerUrl.split('/').pop());
       storedSkills = storedSkills.filter(s => s.id !== skillId);
@@ -350,7 +491,7 @@ const getMockResponse = (url, method, data) => {
     return storedSkills;
   }
 
-  // --- 8. AI SKILL GAP ANALYSIS ENDPOINT ---
+  // 9. AI SKILL GAP ANALYSIS
   if (lowerUrl.includes('/ai/skill-gap')) {
     return {
       match_score: 95.8,
@@ -360,27 +501,6 @@ const getMockResponse = (url, method, data) => {
         'Complete a quick module on Docker containerization to maximize match score for cloud engineering roles.',
         'Highlight your hands-on REST API & state management experience in your profile summary.'
       ]
-    };
-  }
-
-  // --- 9. RECRUITER & ADMIN MOCK ENDPOINTS ---
-  if (lowerUrl.includes('/recruiter/profile') || lowerUrl.includes('/recruiter/company')) {
-    return {
-      full_name: 'Lead Recruiter',
-      email: 'recruiter@hireai.com',
-      company_name: 'TechCorp AI Labs',
-      industry: 'Artificial Intelligence & Software',
-      website: 'https://techcorp.ai'
-    };
-  }
-
-  if (lowerUrl.includes('/admin/stats')) {
-    return {
-      total_users: 1420,
-      active_jobs: 86,
-      total_applications: 3890,
-      match_accuracy: 96.4,
-      ai_parses_completed: 12450
     };
   }
 
