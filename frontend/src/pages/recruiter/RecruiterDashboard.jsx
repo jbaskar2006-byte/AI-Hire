@@ -187,7 +187,7 @@ export const RecruiterDashboard = () => {
           <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-indigo-950/80 via-purple-950/60 to-slate-950 p-8 border border-indigo-500/20 shadow-2xl">
             <div className="absolute inset-0 z-0 opacity-30">
               <img 
-                src="/images/recruiter_talent_search.png" 
+                src="./images/recruiter_talent_search.png" 
                 alt="AI Recruiter Talent Sourcing Engine" 
                 className="w-full h-full object-cover" 
               />
@@ -310,7 +310,7 @@ export const RecruiterDashboard = () => {
                 className="rounded-2xl bg-slate-950/60 border border-slate-800 text-left hover:border-indigo-500/40 transition-all group overflow-hidden shadow-lg flex flex-col justify-between"
               >
                 <div className="h-36 overflow-hidden relative">
-                  <img src="/images/recruiter_workspace_collaboration.png" alt="Job Posting Management" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                  <img src="./images/recruiter_workspace_collaboration.png" alt="Job Posting Management" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
                   <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/30 to-transparent" />
                   <span className="absolute top-3 right-3 text-[10px] px-2 py-0.5 rounded-full bg-indigo-500/20 border border-indigo-400/30 text-indigo-300 font-mono font-bold">Active</span>
                 </div>
@@ -326,7 +326,7 @@ export const RecruiterDashboard = () => {
                 className="rounded-2xl bg-slate-950/60 border border-slate-800 text-left hover:border-indigo-500/40 transition-all group overflow-hidden shadow-lg flex flex-col justify-between"
               >
                 <div className="h-36 overflow-hidden relative">
-                  <img src="/images/recruiter_talent_search.png" alt="Candidate Match Ranking" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                  <img src="./images/recruiter_talent_search.png" alt="Candidate Match Ranking" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
                   <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/30 to-transparent" />
                   <span className="absolute top-3 right-3 text-[10px] px-2 py-0.5 rounded-full bg-indigo-500/20 border border-indigo-400/30 text-indigo-300 font-mono font-bold">Active</span>
                 </div>
@@ -342,7 +342,7 @@ export const RecruiterDashboard = () => {
                 className="rounded-2xl bg-slate-950/60 border border-slate-800 text-left hover:border-indigo-500/40 transition-all group overflow-hidden shadow-lg flex flex-col justify-between"
               >
                 <div className="h-36 overflow-hidden relative">
-                  <img src="/images/ai_analytics_dashboard.png" alt="Recruitment Analytics" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                  <img src="./images/ai_analytics_dashboard.png" alt="Recruitment Analytics" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
                   <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/30 to-transparent" />
                   <span className="absolute top-3 right-3 text-[10px] px-2 py-0.5 rounded-full bg-indigo-500/20 border border-indigo-400/30 text-indigo-300 font-mono font-bold">Active</span>
                 </div>
@@ -358,7 +358,7 @@ export const RecruiterDashboard = () => {
                 className="rounded-2xl bg-slate-950/60 border border-slate-800 text-left hover:border-blue-500/40 transition-all group overflow-hidden shadow-lg flex flex-col justify-between"
               >
                 <div className="h-36 overflow-hidden relative">
-                  <img src="/images/company_office_building.png" alt="Company Workspace" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                  <img src="./images/company_office_building.png" alt="Company Workspace" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
                   <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/30 to-transparent" />
                   <span className="absolute top-3 right-3 text-[10px] px-2 py-0.5 rounded-full bg-blue-500/20 border border-blue-400/30 text-blue-300 font-mono font-bold">Active</span>
                 </div>
@@ -374,7 +374,7 @@ export const RecruiterDashboard = () => {
                 className="rounded-2xl bg-slate-950/60 border border-slate-800 text-left hover:border-purple-500/40 transition-all group overflow-hidden shadow-lg flex flex-col justify-between"
               >
                 <div className="h-36 overflow-hidden relative">
-                  <img src="/images/vibrant_ai_matching.png" alt="AI Match Sourcing" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                  <img src="./images/vibrant_ai_matching.png" alt="AI Match Sourcing" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
                   <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/30 to-transparent" />
                   <span className="absolute top-3 right-3 text-[10px] px-2 py-0.5 rounded-full bg-purple-500/20 border border-purple-400/30 text-purple-300 font-mono font-bold">Active</span>
                 </div>
@@ -390,7 +390,7 @@ export const RecruiterDashboard = () => {
                 className="rounded-2xl bg-slate-950/60 border border-slate-800 text-left hover:border-amber-500/40 transition-all group overflow-hidden shadow-lg flex flex-col justify-between"
               >
                 <div className="h-36 overflow-hidden relative">
-                  <img src="/images/ai_command_center.jpg" alt="Talent Command Center" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                  <img src="./images/ai_command_center.jpg" alt="Talent Command Center" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
                   <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/30 to-transparent" />
                   <span className="absolute top-3 right-3 text-[10px] px-2 py-0.5 rounded-full bg-amber-500/20 border border-amber-400/30 text-amber-300 font-mono font-bold">Active</span>
                 </div>

@@ -83,7 +83,7 @@ export const MyApplications = () => {
       <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-emerald-950/80 via-teal-950/60 to-slate-950 p-8 border border-emerald-500/20 shadow-2xl">
         <div className="absolute inset-0 z-0 opacity-25">
           <img 
-            src="/images/ai_command_center.jpg" 
+            src="./images/ai_command_center.jpg" 
             alt="Application Tracking Center" 
             className="w-full h-full object-cover" 
           />

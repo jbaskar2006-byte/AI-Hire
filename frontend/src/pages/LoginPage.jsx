@@ -53,7 +53,7 @@ export const LoginPage = () => {
         <div className="lg:col-span-6 hidden lg:flex flex-col justify-between p-8 rounded-3xl bg-slate-900/60 border border-slate-800 backdrop-blur-xl relative overflow-hidden shadow-2xl min-h-[540px]">
           <div className="absolute inset-0 z-0 opacity-40">
             <img 
-              src="/images/team_collaboration.jpg" 
+              src="./images/team_collaboration.jpg" 
               alt="Recruitment Team Collaboration" 
               className="w-full h-full object-cover"
             />

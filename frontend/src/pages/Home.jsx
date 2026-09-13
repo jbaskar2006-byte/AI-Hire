@@ -124,7 +124,7 @@ export const Home = () => {
         <div className="mt-14 max-w-5xl mx-auto rounded-3xl overflow-hidden border border-indigo-500/30 p-2 bg-gradient-to-b from-indigo-500/20 via-purple-500/10 to-slate-900/80 shadow-2xl shadow-purple-500/20 group relative">
           <div className="relative rounded-2xl overflow-hidden aspect-[16/9] sm:aspect-[21/9]">
             <img 
-              src="/images/hero_ai_recruitment.png" 
+              src="./images/hero_ai_recruitment.png" 
               alt="AI Recruitment Command Dashboard"
               className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
             />
@@ -163,7 +163,7 @@ export const Home = () => {
           <div className="bg-slate-900/60 backdrop-blur-md rounded-3xl overflow-hidden border border-slate-800 hover:border-indigo-500/40 transition-all duration-300 group shadow-xl flex flex-col justify-between">
             <div className="relative h-48 overflow-hidden">
               <img 
-                src="/images/recruiter_talent_search.png" 
+                src="./images/recruiter_talent_search.png" 
                 alt="Recruiter Team Sourcing Engine"
                 className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
               />
@@ -193,7 +193,7 @@ export const Home = () => {
           <div className="bg-slate-900/60 backdrop-blur-md rounded-3xl overflow-hidden border border-slate-800 hover:border-emerald-500/40 transition-all duration-300 group shadow-xl flex flex-col justify-between">
             <div className="relative h-48 overflow-hidden">
               <img 
-                src="/images/interview_practice_bot.png" 
+                src="./images/interview_practice_bot.png" 
                 alt="AI Interview & Career Assistant"
                 className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
               />
@@ -223,7 +223,7 @@ export const Home = () => {
           <div className="bg-slate-900/60 backdrop-blur-md rounded-3xl overflow-hidden border border-slate-800 hover:border-purple-500/40 transition-all duration-300 group shadow-xl flex flex-col justify-between">
             <div className="relative h-48 overflow-hidden">
               <img 
-                src="/images/ai_analytics_dashboard.png" 
+                src="./images/ai_analytics_dashboard.png" 
                 alt="AI Analytics Command Center"
                 className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
               />
@@ -259,22 +259,22 @@ export const Home = () => {
 
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             <div className="relative h-36 rounded-2xl overflow-hidden border border-slate-800 group">
-              <img src="/images/resume_builder_ai.png" alt="AI Resume Parser" className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
+              <img src="./images/resume_builder_ai.png" alt="AI Resume Parser" className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
               <div className="absolute inset-0 bg-slate-950/50 group-hover:bg-slate-950/20 transition-colors" />
               <span className="absolute bottom-2 left-2 text-[10px] font-bold text-white bg-slate-900/80 px-2 py-1 rounded-md">Resume Parser</span>
             </div>
             <div className="relative h-36 rounded-2xl overflow-hidden border border-slate-800 group">
-              <img src="/images/skill_gap_analysis.png" alt="Skill Gap Analysis" className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
+              <img src="./images/skill_gap_analysis.png" alt="Skill Gap Analysis" className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
               <div className="absolute inset-0 bg-slate-950/50 group-hover:bg-slate-950/20 transition-colors" />
               <span className="absolute bottom-2 left-2 text-[10px] font-bold text-white bg-slate-900/80 px-2 py-1 rounded-md">Skill Gap Radar</span>
             </div>
             <div className="relative h-36 rounded-2xl overflow-hidden border border-slate-800 group">
-              <img src="/images/recommendations_job_feed.png" alt="Job Feed Match" className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
+              <img src="./images/recommendations_job_feed.png" alt="Job Feed Match" className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
               <div className="absolute inset-0 bg-slate-950/50 group-hover:bg-slate-950/20 transition-colors" />
               <span className="absolute bottom-2 left-2 text-[10px] font-bold text-white bg-slate-900/80 px-2 py-1 rounded-md">AI Matching</span>
             </div>
             <div className="relative h-36 rounded-2xl overflow-hidden border border-slate-800 group">
-              <img src="/images/company_office_building.png" alt="Company Workspace" className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
+              <img src="./images/company_office_building.png" alt="Company Workspace" className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
               <div className="absolute inset-0 bg-slate-950/50 group-hover:bg-slate-950/20 transition-colors" />
               <span className="absolute bottom-2 left-2 text-[10px] font-bold text-white bg-slate-900/80 px-2 py-1 rounded-md">Employer Hub</span>
             </div>

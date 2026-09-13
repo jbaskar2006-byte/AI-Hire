@@ -189,7 +189,7 @@ export const CandidateDashboard = () => {
           <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-emerald-950/80 via-teal-950/60 to-slate-950 p-8 border border-emerald-500/20 shadow-2xl">
             <div className="absolute inset-0 z-0 opacity-25">
               <img 
-                src="/images/tech_workspace.jpg" 
+                src="./images/tech_workspace.jpg" 
                 alt="Candidate Workstation" 
                 className="w-full h-full object-cover" 
               />
@@ -308,7 +308,7 @@ export const CandidateDashboard = () => {
                 className="rounded-2xl bg-slate-950/60 border border-slate-800 text-left hover:border-emerald-500/40 transition-all group overflow-hidden shadow-lg flex flex-col justify-between"
               >
                 <div className="h-36 overflow-hidden relative">
-                  <img src="/images/recommendations_job_feed.png" alt="AI Job Recommendations" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                  <img src="./images/recommendations_job_feed.png" alt="AI Job Recommendations" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
                   <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/30 to-transparent" />
                   <span className="absolute top-3 right-3 text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/20 border border-emerald-400/30 text-emerald-300 font-mono font-bold">Active</span>
                 </div>
@@ -324,7 +324,7 @@ export const CandidateDashboard = () => {
                 className="rounded-2xl bg-slate-950/60 border border-slate-800 text-left hover:border-emerald-500/40 transition-all group overflow-hidden shadow-lg flex flex-col justify-between"
               >
                 <div className="h-36 overflow-hidden relative">
-                  <img src="/images/skill_gap_analysis.png" alt="Skill Gap Analysis" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                  <img src="./images/skill_gap_analysis.png" alt="Skill Gap Analysis" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
                   <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/30 to-transparent" />
                   <span className="absolute top-3 right-3 text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/20 border border-emerald-400/30 text-emerald-300 font-mono font-bold">Active</span>
                 </div>
@@ -340,7 +340,7 @@ export const CandidateDashboard = () => {
                 className="rounded-2xl bg-slate-950/60 border border-slate-800 text-left hover:border-purple-500/40 transition-all group overflow-hidden shadow-lg flex flex-col justify-between"
               >
                 <div className="h-36 overflow-hidden relative">
-                  <img src="/images/interview_practice_bot.png" alt="Interview Prep Assistant" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                  <img src="./images/interview_practice_bot.png" alt="Interview Prep Assistant" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
                   <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/30 to-transparent" />
                   <span className="absolute top-3 right-3 text-[10px] px-2 py-0.5 rounded-full bg-purple-500/20 border border-purple-400/30 text-purple-300 font-mono font-bold">Active</span>
                 </div>
@@ -356,7 +356,7 @@ export const CandidateDashboard = () => {
                 className="rounded-2xl bg-slate-950/60 border border-slate-800 text-left hover:border-blue-500/40 transition-all group overflow-hidden shadow-lg flex flex-col justify-between"
               >
                 <div className="h-36 overflow-hidden relative">
-                  <img src="/images/resume_builder_ai.png" alt="AI Resume Parsing & Builder" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                  <img src="./images/resume_builder_ai.png" alt="AI Resume Parsing & Builder" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
                   <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/30 to-transparent" />
                   <span className="absolute top-3 right-3 text-[10px] px-2 py-0.5 rounded-full bg-blue-500/20 border border-blue-400/30 text-blue-300 font-mono font-bold">Active</span>
                 </div>
@@ -372,7 +372,7 @@ export const CandidateDashboard = () => {
                 className="rounded-2xl bg-slate-950/60 border border-slate-800 text-left hover:border-teal-500/40 transition-all group overflow-hidden shadow-lg flex flex-col justify-between"
               >
                 <div className="h-36 overflow-hidden relative">
-                  <img src="/images/team_collaboration.jpg" alt="Team & Career Profile" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                  <img src="./images/team_collaboration.jpg" alt="Team & Career Profile" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
                   <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/30 to-transparent" />
                   <span className="absolute top-3 right-3 text-[10px] px-2 py-0.5 rounded-full bg-teal-500/20 border border-teal-400/30 text-teal-300 font-mono font-bold">Active</span>
                 </div>
@@ -388,7 +388,7 @@ export const CandidateDashboard = () => {
                 className="rounded-2xl bg-slate-950/60 border border-slate-800 text-left hover:border-amber-500/40 transition-all group overflow-hidden shadow-lg flex flex-col justify-between"
               >
                 <div className="h-36 overflow-hidden relative">
-                  <img src="/images/ai_command_center.jpg" alt="AI Application Tracker" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                  <img src="./images/ai_command_center.jpg" alt="AI Application Tracker" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
                   <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/30 to-transparent" />
                   <span className="absolute top-3 right-3 text-[10px] px-2 py-0.5 rounded-full bg-amber-500/20 border border-amber-400/30 text-amber-300 font-mono font-bold">Active</span>
                 </div>

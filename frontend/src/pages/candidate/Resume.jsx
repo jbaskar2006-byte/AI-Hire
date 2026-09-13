@@ -166,7 +166,7 @@ export default function Resume() {
       <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-blue-950 via-indigo-950 to-slate-950 text-white p-8 shadow-xl border border-blue-500/20">
         <div className="absolute inset-0 z-0 opacity-30">
           <img 
-            src="/images/resume_builder_ai.png" 
+            src="./images/resume_builder_ai.png" 
             alt="AI Resume Optimizer Engine" 
             className="w-full h-full object-cover" 
           />

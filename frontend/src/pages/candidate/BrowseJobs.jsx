@@ -119,7 +119,7 @@ export const BrowseJobs = () => {
       <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-emerald-950/80 via-teal-950/60 to-slate-950 p-8 border border-emerald-500/20 shadow-2xl">
         <div className="absolute inset-0 z-0 opacity-25">
           <img 
-            src="/images/team_collaboration.jpg" 
+            src="./images/team_collaboration.jpg" 
             alt="Career Opportunities & Hiring Teams" 
             className="w-full h-full object-cover" 
           />

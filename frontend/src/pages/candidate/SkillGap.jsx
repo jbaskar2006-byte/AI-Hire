@@ -101,7 +101,7 @@ export default function SkillGap() {
       <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-teal-950/80 via-emerald-950/60 to-slate-950 text-white p-8 border border-emerald-500/20 shadow-xl">
         <div className="absolute inset-0 z-0 opacity-30">
           <img 
-            src="/images/skill_gap_analysis.png" 
+            src="./images/skill_gap_analysis.png" 
             alt="AI Skill Gap Radar Analysis" 
             className="w-full h-full object-cover" 
           />

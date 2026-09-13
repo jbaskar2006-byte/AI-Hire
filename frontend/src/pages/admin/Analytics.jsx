@@ -77,7 +77,7 @@ export default function AdminAnalytics() {
         <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-purple-950/80 via-indigo-950/60 to-slate-950 p-8 border border-purple-500/20 shadow-2xl">
           <div className="absolute inset-0 z-0 opacity-25">
             <img 
-              src="/images/ai_analytics_dashboard.png" 
+              src="./images/ai_analytics_dashboard.png" 
               alt="AI Analytics Command Center" 
               className="w-full h-full object-cover" 
             />

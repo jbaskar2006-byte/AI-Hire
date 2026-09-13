@@ -88,7 +88,7 @@ export default function Recommendations() {
       <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-indigo-950/80 via-purple-950/60 to-slate-950 text-white p-8 border border-indigo-500/20 shadow-xl">
         <div className="absolute inset-0 z-0 opacity-30">
           <img 
-            src="/images/recommendations_job_feed.png" 
+            src="./images/recommendations_job_feed.png" 
             alt="AI Smart Job Feed" 
             className="w-full h-full object-cover" 
           />
