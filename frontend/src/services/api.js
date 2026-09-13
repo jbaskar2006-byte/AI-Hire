@@ -35,52 +35,92 @@ const getMockResponse = (url, method, data) => {
     }
   }
 
-  // --- 1. AUTHENTICATION & USER ENDPOINTS ---
+  // Active Job Database
+  const baseJobs = [
+    {
+      id: 101,
+      title: 'Full-Stack Developer',
+      company_name: 'TechCorp AI Labs',
+      company: { name: 'TechCorp AI Labs', industry: 'Software & AI', location: 'Chennai, TN', website: 'https://techcorp.ai' },
+      location: 'Chennai, TN (Hybrid)',
+      job_type: 'Full Time',
+      salary_range: '₹8,00,000 - ₹12,00,000',
+      salary_min: 800000,
+      salary_max: 1200000,
+      min_experience: 1,
+      description: 'Build production-grade full-stack web applications with React.js, Node.js, Express, and MySQL/MongoDB databases. Responsible for REST API architecture, responsive frontend, and database schema design.',
+      requirements: 'React.js, Python, Java, JavaScript, Node.js, Express, REST API, MySQL, MongoDB, Tailwind',
+      skills: [
+        { skill_name: 'React.js', skill_type: 'required' },
+        { skill_name: 'Python', skill_type: 'required' },
+        { skill_name: 'Node.js', skill_type: 'required' },
+        { skill_name: 'Express', skill_type: 'required' },
+        { skill_name: 'MySQL', skill_type: 'preferred' },
+        { skill_name: 'MongoDB', skill_type: 'preferred' }
+      ],
+      status: 'active',
+      applications_count: 14,
+      created_at: new Date().toISOString()
+    },
+    {
+      id: 102,
+      title: 'Python Development Intern',
+      company_name: 'DataPulse Analytics',
+      company: { name: 'DataPulse Analytics', industry: 'Analytics', location: 'Remote / Chennai', website: 'https://datapulse.dev' },
+      location: 'Remote / Chennai',
+      job_type: 'Internship',
+      salary_range: '₹25,000 / month',
+      salary_min: 25000,
+      salary_max: 40000,
+      min_experience: 0,
+      description: 'Develop automated Python backend scripts, REST API endpoints, and data processing utilities. Collaborate on data pipeline architecture and database synchronization.',
+      requirements: 'Python, REST API, MySQL, Git/GitHub, Data Structures',
+      skills: [
+        { skill_name: 'Python', skill_type: 'required' },
+        { skill_name: 'REST API', skill_type: 'required' },
+        { skill_name: 'Git/GitHub', skill_type: 'preferred' }
+      ],
+      status: 'active',
+      applications_count: 22,
+      created_at: new Date().toISOString()
+    },
+    {
+      id: 103,
+      title: 'Data Science Virtual Intern',
+      company_name: 'AI Vision Labs',
+      company: { name: 'AI Vision Labs', industry: 'AI & Data Science', location: 'Remote', website: 'https://aivision.io' },
+      location: 'Remote',
+      job_type: 'Internship',
+      salary_range: '₹20,000 / month',
+      salary_min: 20000,
+      salary_max: 35000,
+      min_experience: 0,
+      description: 'Build real-time data synchronization pipelines using Firebase, Python, and SQL databases. Analyze store metrics and surface AI-driven insights.',
+      requirements: 'Python, SQL, Firebase, Data Analysis, Git',
+      skills: [
+        { skill_name: 'Python', skill_type: 'required' },
+        { skill_name: 'Firebase', skill_type: 'required' },
+        { skill_name: 'SQL', skill_type: 'preferred' }
+      ],
+      status: 'active',
+      applications_count: 18,
+      created_at: new Date().toISOString()
+    }
+  ];
+
+  // --- 1. AUTHENTICATION ENDPOINTS ---
   if (lowerUrl.includes('/auth/me')) {
     const saved = localStorage.getItem('hireai_user');
-    return saved ? JSON.parse(saved) : { id: 1, full_name: 'Demo Candidate', email: 'candidate@hireai.com', role: 'candidate' };
+    return saved ? JSON.parse(saved) : { id: 1, full_name: 'Baskar J', email: 'Jbaskar2006@gmail.com', role: 'candidate' };
   }
 
-  // --- 2. CANDIDATE RESUME ANALYSIS ENDPOINTS ---
+  // --- 2. CANDIDATE RESUME ENDPOINTS ---
   if (lowerUrl.includes('/candidate/resume/latest') || (lowerUrl.includes('/candidate/resume') && method === 'get' && !lowerUrl.includes('/history'))) {
     const storedResume = localStorage.getItem('hireai_latest_resume');
     if (storedResume) {
       return { resume: JSON.parse(storedResume) };
     }
-    const defaultResume = {
-      id: 1,
-      original_filename: 'Demo_Candidate_Resume.pdf',
-      file_type: 'pdf',
-      file_size: 1048576,
-      uploaded_at: new Date().toISOString(),
-      total_skills_count: 12,
-      personal_info: {
-        name: 'Demo Candidate',
-        email: 'candidate@hireai.com',
-        phone: '+1 (555) 234-5678'
-      },
-      skills_by_category: {
-        'Programming Languages': ['Python', 'JavaScript', 'TypeScript', 'SQL'],
-        'Frameworks & Libraries': ['React', 'FastAPI', 'Node.js', 'TailwindCSS'],
-        'AI & Data Processing': ['Machine Learning', 'PyPDF', 'NLP', 'Scikit-Learn']
-      },
-      all_extracted_skills: ['Python', 'JavaScript', 'TypeScript', 'SQL', 'React', 'FastAPI', 'Node.js', 'TailwindCSS', 'Machine Learning', 'PyPDF', 'NLP', 'Scikit-Learn'],
-      education: [
-        'B.S. in Computer Science - State University (2020 - 2024)'
-      ],
-      experience: [
-        'Senior Full-Stack & AI Engineer at Tech Solutions Inc. (2024 - Present)'
-      ],
-      projects: [
-        'HireAI Intelligent Recruitment & Candidate Scoring System',
-        'Automated Resume Extraction & Line-by-Line Skill Parser'
-      ],
-      certifications: [
-        'AWS Certified Solutions Architect',
-        'TensorFlow Machine Learning Specialist'
-      ]
-    };
-    return { resume: defaultResume };
+    return { resume: null };
   }
 
   if (lowerUrl.includes('/candidate/resume/history')) {
@@ -88,33 +128,163 @@ const getMockResponse = (url, method, data) => {
     if (storedHistory) {
       return { resumes: JSON.parse(storedHistory) };
     }
-    const defaultHistory = [
-      {
-        id: 1,
-        original_filename: 'Demo_Candidate_Resume.pdf',
-        file_type: 'pdf',
-        file_size: 1048576,
-        extracted_skills_count: 12,
-        analysis_status: 'Completed',
-        uploaded_at: new Date().toISOString()
-      }
-    ];
-    return { resumes: defaultHistory };
+    return { resumes: [] };
   }
 
   if (lowerUrl.includes('/candidate/resume') && method === 'post') {
-    // Pass offline signal so resumeService runs live client-side PDF/DOCX parsing on uploaded file
     return { offline: true, message: 'Backend unavailable, client-side parsing required' };
   }
 
-  // --- 3. CANDIDATE PROFILE ENDPOINTS ---
+  // --- 3. CANDIDATE APPLICATIONS ENDPOINTS ---
+  if (lowerUrl.includes('/applications')) {
+    let storedApps = JSON.parse(localStorage.getItem('hireai_applications') || 'null');
+    if (!storedApps) {
+      storedApps = [
+        {
+          id: 501,
+          job_id: 101,
+          status: 'Applied',
+          applied_at: new Date().toISOString(),
+          job: baseJobs[0]
+        },
+        {
+          id: 502,
+          job_id: 102,
+          status: 'Under Review',
+          applied_at: new Date().toISOString(),
+          job: baseJobs[1]
+        }
+      ];
+      localStorage.setItem('hireai_applications', JSON.stringify(storedApps));
+    }
+
+    // Submit New Application (POST /applications/:jobId)
+    if (method === 'post') {
+      const urlParts = lowerUrl.split('/');
+      const jobId = parseInt(urlParts[urlParts.length - 1]) || 101;
+      const targetJob = baseJobs.find(j => j.id === jobId) || baseJobs[0];
+
+      const existingIndex = storedApps.findIndex(a => a.job_id === jobId || a.job?.id === jobId);
+      let newApp;
+      if (existingIndex >= 0) {
+        newApp = storedApps[existingIndex];
+      } else {
+        newApp = {
+          id: Date.now(),
+          job_id: targetJob.id,
+          status: 'Applied',
+          applied_at: new Date().toISOString(),
+          job: targetJob
+        };
+        storedApps.unshift(newApp);
+        localStorage.setItem('hireai_applications', JSON.stringify(storedApps));
+      }
+      return { status: 'success', message: 'Application submitted successfully!', application: newApp };
+    }
+
+    // Withdraw Application (DELETE /applications/:id)
+    if (method === 'delete') {
+      const appId = parseInt(lowerUrl.split('/').pop());
+      storedApps = storedApps.filter(a => a.id !== appId && a.job_id !== appId);
+      localStorage.setItem('hireai_applications', JSON.stringify(storedApps));
+      return { status: 'success', message: 'Application withdrawn successfully' };
+    }
+
+    // Return Candidate's Applications (GET /applications/my or GET /applications)
+    return storedApps;
+  }
+
+  // --- 4. JOBS BOARD ENDPOINTS ---
+  if (lowerUrl.includes('/jobs')) {
+    const storedApps = JSON.parse(localStorage.getItem('hireai_applications') || '[]');
+    const appliedJobIds = storedApps.map(a => a.job_id || a.job?.id);
+
+    const jobsWithAppliedState = baseJobs.map(j => ({
+      ...j,
+      has_applied: appliedJobIds.includes(j.id)
+    }));
+
+    // Single Job Detail (GET /jobs/:id)
+    if (method === 'get' && lowerUrl.match(/\/jobs\/\d+/)) {
+      const jobId = parseInt(lowerUrl.split('/').pop());
+      const singleJob = jobsWithAppliedState.find(j => j.id === jobId) || jobsWithAppliedState[0];
+      return singleJob;
+    }
+
+    // Paginated Job Listing (GET /jobs)
+    return {
+      items: jobsWithAppliedState,
+      total: jobsWithAppliedState.length,
+      page: 1,
+      size: 9,
+      pages: 1
+    };
+  }
+
+  // --- 5. AI RECOMMENDATIONS ENDPOINTS ---
+  if (lowerUrl.includes('/ai/recommend-jobs') || lowerUrl.includes('/ai/recommendations')) {
+    const storedApps = JSON.parse(localStorage.getItem('hireai_applications') || '[]');
+    const appliedJobIds = storedApps.map(a => a.job_id || a.job?.id);
+
+    const recommendations = [
+      {
+        job_id: 101,
+        title: 'Full-Stack Developer',
+        company_name: 'TechCorp AI Labs',
+        location: 'Chennai, TN (Hybrid)',
+        job_type: 'Full Time',
+        min_experience: 1,
+        salary_min: 800000,
+        salary_max: 1200000,
+        match_score: 96.5,
+        skill_coverage: 95,
+        matched_skills: ['React.js', 'Python', 'Node.js', 'Express', 'MySQL', 'MongoDB'],
+        has_applied: appliedJobIds.includes(101)
+      },
+      {
+        job_id: 102,
+        title: 'Python Development Intern',
+        company_name: 'DataPulse Analytics',
+        location: 'Remote / Chennai',
+        job_type: 'Internship',
+        min_experience: 0,
+        salary_min: 25000,
+        salary_max: 40000,
+        match_score: 94.0,
+        skill_coverage: 92,
+        matched_skills: ['Python', 'REST API', 'MySQL', 'Git/GitHub'],
+        has_applied: appliedJobIds.includes(102)
+      },
+      {
+        job_id: 103,
+        title: 'Data Science Virtual Intern',
+        company_name: 'AI Vision Labs',
+        location: 'Remote',
+        job_type: 'Internship',
+        min_experience: 0,
+        salary_min: 20000,
+        salary_max: 35000,
+        match_score: 91.5,
+        skill_coverage: 88,
+        matched_skills: ['Python', 'SQL', 'Firebase', 'Data Analysis'],
+        has_applied: appliedJobIds.includes(103)
+      }
+    ];
+
+    return {
+      recommendations: recommendations,
+      total_recommendations: recommendations.length
+    };
+  }
+
+  // --- 6. CANDIDATE PROFILE ENDPOINTS ---
   if (lowerUrl.includes('/candidate/profile')) {
     if (method === 'put') {
       const existing = JSON.parse(localStorage.getItem('hireai_candidate_profile') || '{}');
       const updated = {
         ...existing,
         ...reqData,
-        profile_completion: 95
+        profile_completion: 98
       };
       localStorage.setItem('hireai_candidate_profile', JSON.stringify(updated));
       return updated;
@@ -125,28 +295,29 @@ const getMockResponse = (url, method, data) => {
       return JSON.parse(storedProfile);
     }
     return {
-      phone: '+1 (555) 234-5678',
-      location: 'San Francisco, CA',
-      education: 'B.S. Computer Science, Stanford University',
-      experience_years: 5,
-      linkedin_url: 'https://linkedin.com/in/democandidate',
-      github_url: 'https://github.com/democandidate',
-      portfolio_url: 'https://democandidate.dev',
-      profile_completion: 92
+      phone: '+91 6381962678',
+      location: 'Chennai, Tamil Nadu',
+      education: 'B.Tech – Computer Science & Engineering, Rajalakshmi Institute of Technology',
+      experience_years: 1,
+      linkedin_url: 'https://linkedin.com/in/baskar-j-46b7bb32b',
+      github_url: 'https://github.com/jbaskar2006-byte',
+      portfolio_url: '',
+      profile_completion: 98
     };
   }
 
-  // --- 4. CANDIDATE TECHNICAL SKILLS ENDPOINTS ---
+  // --- 7. CANDIDATE TECHNICAL SKILLS ENDPOINTS ---
   if (lowerUrl.includes('/candidate/skills')) {
     let storedSkills = JSON.parse(localStorage.getItem('hireai_skills') || 'null');
     if (!storedSkills) {
       storedSkills = [
-        { id: 1, skill_name: 'React', skill_level: 'Expert' },
-        { id: 2, skill_name: 'Python', skill_level: 'Advanced' },
-        { id: 3, skill_name: 'FastAPI', skill_level: 'Advanced' },
-        { id: 4, skill_name: 'SQL', skill_level: 'Intermediate' },
-        { id: 5, skill_name: 'TailwindCSS', skill_level: 'Expert' },
-        { id: 6, skill_name: 'Machine Learning', skill_level: 'Intermediate' }
+        { id: 1, skill_name: 'Python', skill_level: 'Expert' },
+        { id: 2, skill_name: 'JavaScript', skill_level: 'Expert' },
+        { id: 3, skill_name: 'React.js', skill_level: 'Advanced' },
+        { id: 4, skill_name: 'Node.js', skill_level: 'Advanced' },
+        { id: 5, skill_name: 'Express', skill_level: 'Advanced' },
+        { id: 6, skill_name: 'MySQL', skill_level: 'Intermediate' },
+        { id: 7, skill_name: 'MongoDB', skill_level: 'Intermediate' }
       ];
       localStorage.setItem('hireai_skills', JSON.stringify(storedSkills));
     }
@@ -179,153 +350,20 @@ const getMockResponse = (url, method, data) => {
     return storedSkills;
   }
 
-  // --- 5. CANDIDATE APPLICATIONS ENDPOINTS ---
-  if (lowerUrl.includes('/applications') || lowerUrl.includes('/candidate/applications')) {
-    let storedApps = JSON.parse(localStorage.getItem('hireai_applications') || 'null');
-    if (!storedApps) {
-      storedApps = [
-        {
-          id: 501,
-          job_title: 'Senior Full-Stack AI Engineer',
-          company_name: 'TechCorp AI Labs',
-          status: 'Under Review',
-          applied_at: new Date().toISOString(),
-          match_score: 95.8
-        },
-        {
-          id: 502,
-          job_title: 'Machine Learning & NLP Specialist',
-          company_name: 'DataPulse Analytics',
-          status: 'Interview Scheduled',
-          applied_at: new Date().toISOString(),
-          match_score: 91.2
-        }
-      ];
-      localStorage.setItem('hireai_applications', JSON.stringify(storedApps));
-    }
-
-    if (method === 'post') {
-      const newApp = {
-        id: Date.now(),
-        job_title: 'Applied Position',
-        company_name: 'Tech Partner',
-        status: 'Submitted',
-        applied_at: new Date().toISOString(),
-        match_score: 92.5
-      };
-      storedApps.unshift(newApp);
-      localStorage.setItem('hireai_applications', JSON.stringify(storedApps));
-      return newApp;
-    }
-
-    return storedApps;
-  }
-
-  // --- 6. JOBS BOARD ENDPOINTS ---
-  if (lowerUrl.includes('/jobs')) {
-    const mockJobs = [
-      {
-        id: 101,
-        title: 'Senior Full-Stack AI Engineer',
-        company_name: 'TechCorp AI Labs',
-        company: { name: 'TechCorp AI Labs', industry: 'Artificial Intelligence', location: 'San Francisco, CA', website: 'https://techcorp.ai' },
-        location: 'San Francisco, CA (Hybrid)',
-        job_type: 'Full-Time',
-        salary_range: '$140,000 - $180,000',
-        salary_min: 140000,
-        salary_max: 180000,
-        min_experience: 3,
-        description: 'Lead development of next-generation AI hiring and candidate evaluation algorithms using React, Python FastAPI, and LLMs.\n\nKey Responsibilities:\n• Architect scalable web applications and state management systems.\n• Develop automated document extraction models & skill matching matrix.',
-        requirements: 'React, Python, FastAPI, Machine Learning, PostgreSQL, Docker',
-        skills: [
-          { skill_name: 'React', skill_type: 'required' },
-          { skill_name: 'Python', skill_type: 'required' },
-          { skill_name: 'FastAPI', skill_type: 'required' },
-          { skill_name: 'Machine Learning', skill_type: 'preferred' }
-        ],
-        status: 'active',
-        applications_count: 42,
-        created_at: new Date().toISOString()
-      },
-      {
-        id: 102,
-        title: 'Machine Learning & NLP Specialist',
-        company_name: 'DataPulse Analytics',
-        company: { name: 'DataPulse Analytics', industry: 'Data Intelligence', location: 'Remote', website: 'https://datapulse.dev' },
-        location: 'Remote',
-        job_type: 'Full-Time',
-        salary_range: '$130,000 - $165,000',
-        salary_min: 130000,
-        salary_max: 165000,
-        min_experience: 2,
-        description: 'Design automated document extraction models, resume parsing pipelines, and skill similarity graph matching engines.',
-        requirements: 'Python, PyTorch, Scikit-Learn, PyPDF, NLP, REST APIs',
-        skills: [
-          { skill_name: 'Python', skill_type: 'required' },
-          { skill_name: 'PyPDF', skill_type: 'required' },
-          { skill_name: 'Scikit-Learn', skill_type: 'preferred' }
-        ],
-        status: 'active',
-        applications_count: 28,
-        created_at: new Date().toISOString()
-      }
-    ];
-
-    if (method === 'get' && lowerUrl.match(/\/jobs\/\d+/)) {
-      const jobId = parseInt(lowerUrl.split('/').pop());
-      return mockJobs.find(j => j.id === jobId) || mockJobs[0];
-    }
-    return mockJobs;
-  }
-
-  // --- 7. AI MATCHING, RANKINGS, INTERVIEW PREP & RECS ---
-  if (lowerUrl.includes('/ai/calculate-match') || lowerUrl.includes('/ai/match')) {
-    return {
-      final_score: 95.8,
-      skill_score: 98,
-      experience_score: 92,
-      education_score: 95,
-      similarity_score: 94,
-      explanation: 'Exceptional skill overlap in React, Python, and AI Resume Parsing architecture.'
-    };
-  }
-
-  if (lowerUrl.includes('/ai/rank-candidates')) {
-    return [
-      { candidate_id: 1, full_name: 'Alex Rivera', match_score: 95.8, headline: 'Senior React & Python Developer', match_category: 'Top Match' },
-      { candidate_id: 2, full_name: 'Sophia Chen', match_score: 91.2, headline: 'AI Systems Architect', match_category: 'Strong Match' },
-      { candidate_id: 3, full_name: 'Marcus Vance', match_score: 84.5, headline: 'Full-Stack Software Engineer', match_category: 'Good Match' }
-    ];
-  }
-
-  if (lowerUrl.includes('/ai/interview-questions')) {
-    return [
-      { id: 1, category: 'Technical Architecture', question: 'How do you design a scalable state management system in React for high-frequency real-time updates?', sample_answer: 'By leveraging Context API alongside localized component state or Zustand/Redux for global domain state, avoiding unnecessary re-renders.' },
-      { id: 2, category: 'Backend REST API', question: 'Explain how FastAPI async endpoints handle concurrent asynchronous IO bound requests.', sample_answer: 'FastAPI runs on Starlette/uvicorn using an asyncio event loop, yielding execution on async await calls to serve thousands of concurrent connections.' },
-      { id: 3, category: 'AI & Data Processing', question: 'How do vector embeddings improve candidate resume matching accuracy over simple keyword matching?', sample_answer: 'Embeddings capture semantic context and concept similarity (e.g. matching "NLP" with "Text Parsing"), overcoming exact keyword mismatch limitations.' }
-    ];
-  }
-
+  // --- 8. AI SKILL GAP ANALYSIS ENDPOINT ---
   if (lowerUrl.includes('/ai/skill-gap')) {
     return {
-      match_score: 92.0,
-      matched_skills: ['React', 'Python', 'FastAPI', 'JavaScript', 'SQL'],
+      match_score: 95.8,
+      matched_skills: ['React.js', 'Python', 'Node.js', 'Express', 'MySQL', 'MongoDB', 'REST API'],
       missing_skills: ['Docker', 'Kubernetes'],
       recommendations: [
-        'Complete a quick refresher module on Docker containerization and Kubernetes cluster deployment.',
+        'Complete a quick module on Docker containerization to maximize match score for cloud engineering roles.',
         'Highlight your hands-on REST API & state management experience in your profile summary.'
       ]
     };
   }
 
-  if (lowerUrl.includes('/ai/recommend-jobs')) {
-    return [
-      { id: 101, title: 'Senior Full-Stack AI Engineer', company_name: 'TechCorp AI Labs', match_score: 95.8 },
-      { id: 102, title: 'Machine Learning & NLP Specialist', company_name: 'DataPulse Analytics', match_score: 91.2 }
-    ];
-  }
-
-  // --- 8. RECRUITER & ADMIN ENDPOINTS ---
+  // --- 9. RECRUITER & ADMIN MOCK ENDPOINTS ---
   if (lowerUrl.includes('/recruiter/profile') || lowerUrl.includes('/recruiter/company')) {
     return {
       full_name: 'Lead Recruiter',
@@ -346,21 +384,6 @@ const getMockResponse = (url, method, data) => {
     };
   }
 
-  if (lowerUrl.includes('/admin/users')) {
-    return [
-      { id: 1, full_name: 'Demo Candidate', email: 'candidate@hireai.com', role: 'candidate', is_active: true },
-      { id: 2, full_name: 'Lead Recruiter', email: 'recruiter@hireai.com', role: 'recruiter', is_active: true },
-      { id: 3, full_name: 'System Administrator', email: 'admin@hireai.com', role: 'admin', is_active: true }
-    ];
-  }
-
-  if (lowerUrl.includes('/admin/jobs')) {
-    return [
-      { id: 101, title: 'Senior Full-Stack AI Engineer', company_name: 'TechCorp AI Labs', status: 'Active', applications_count: 42 },
-      { id: 102, title: 'Machine Learning & NLP Specialist', company_name: 'DataPulse Analytics', status: 'Active', applications_count: 28 }
-    ];
-  }
-
   return { status: 'success', message: 'Operation completed in client mode' };
 };
 
@@ -368,7 +391,6 @@ const getMockResponse = (url, method, data) => {
 api.interceptors.response.use(
   (response) => response,
   (error) => {
-    // If backend server is unreachable (e.g. GitHub Pages static deployment or connection refused)
     if (!error.response || error.response.status === 404 || error.code === 'ERR_NETWORK') {
       const url = error.config?.url || '';
       const method = (error.config?.method || 'get').toLowerCase();
