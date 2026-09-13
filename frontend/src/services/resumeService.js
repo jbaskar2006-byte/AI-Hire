@@ -1,12 +1,37 @@
 import api from './api';
 
+// Helper to extract readable text from PDF binary streams
+const extractPdfText = (rawBytes) => {
+  try {
+    const textChunks = [];
+    // Match PDF literal text objects inside ( ... ) Tj or [ ... ] TJ
+    const literalMatches = rawBytes.match(/\(([^()]+)\)/g);
+    if (literalMatches && literalMatches.length > 5) {
+      literalMatches.forEach((str) => {
+        const cleaned = str.slice(1, -1).trim();
+        // Ignore font names, metadata, and structural tags
+        if (cleaned.length > 1 && !cleaned.startsWith('/') && !cleaned.includes('Font') && !cleaned.includes('Adobe')) {
+          textChunks.push(cleaned);
+        }
+      });
+      if (textChunks.length > 0) {
+        return textChunks.join('\n');
+      }
+    }
+  } catch (e) {
+    console.warn("PDF stream extraction fallback note:", e);
+  }
+  return rawBytes;
+};
+
 // Intelligent Client-Side Resume Parsing Engine for Static/Offline Environments
 const parseResumeClientSide = async (file) => {
   return new Promise((resolve) => {
     const reader = new FileReader();
 
     reader.onload = (e) => {
-      const fullText = e.target?.result || '';
+      const rawResult = e.target?.result || '';
+      const fullText = file.name.toLowerCase().endsWith('.pdf') ? extractPdfText(rawResult) : rawResult;
       const lines = fullText.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
 
       // Extract Email
@@ -17,21 +42,30 @@ const parseResumeClientSide = async (file) => {
       const phoneMatch = fullText.match(/(\+?\d{1,3}[-.\s]?)?\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4}/);
       const phone = phoneMatch ? phoneMatch[0] : '+1 (555) 234-5678';
 
-      // Extract Candidate Name from top lines
-      let candidateName = 'Demo Candidate';
-      for (const line of lines.slice(0, 5)) {
-        if (line.length > 2 && line.length < 40 && !line.includes('@') && !line.includes('Resume') && !line.includes('Curriculum')) {
-          candidateName = line;
-          break;
+      // Extract Candidate Name from filename or top lines
+      let candidateName = '';
+      const nameFromFilename = file.name.replace(/\.[^/.]+$/, "").replace(/resume|cv|biodata|parsed|latest/gi, "").replace(/[-_]/g, " ").trim();
+      if (nameFromFilename.length > 2) {
+        candidateName = nameFromFilename.split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+      }
+
+      if (!candidateName) {
+        for (const line of lines.slice(0, 5)) {
+          if (line.length > 2 && line.length < 40 && !line.includes('@') && !line.includes('Resume') && !line.includes('Curriculum')) {
+            candidateName = line;
+            break;
+          }
         }
       }
 
-      // Tech Skills Dictionary & Categorization
+      if (!candidateName) candidateName = 'Demo Candidate';
+
+      // Extensive Tech Skills Dictionary & Categorization
       const techDict = {
-        'Programming Languages': ['Python', 'JavaScript', 'TypeScript', 'Java', 'C++', 'C#', 'SQL', 'HTML', 'CSS', 'Go', 'Rust', 'PHP', 'Ruby'],
-        'Frameworks & Libraries': ['React', 'FastAPI', 'Node.js', 'Express', 'TailwindCSS', 'Vue', 'Angular', 'Django', 'Flask', 'Next.js', 'Redux', 'Bootstrap'],
-        'AI & Data Science': ['Machine Learning', 'Deep Learning', 'PyTorch', 'TensorFlow', 'NLP', 'Scikit-Learn', 'Pandas', 'NumPy', 'PyPDF', 'OpenCV', 'Data Analysis'],
-        'Cloud & DevOps': ['AWS', 'Docker', 'Kubernetes', 'Git', 'GitHub', 'CI/CD', 'Linux', 'PostgreSQL', 'MySQL', 'MongoDB', 'Redis', 'Nginx']
+        'Programming Languages': ['Python', 'JavaScript', 'TypeScript', 'Java', 'C++', 'C#', 'SQL', 'HTML', 'CSS', 'Go', 'Rust', 'PHP', 'Ruby', 'Swift', 'Kotlin'],
+        'Frameworks & Libraries': ['React', 'FastAPI', 'Node.js', 'Express', 'TailwindCSS', 'Vue', 'Angular', 'Django', 'Flask', 'Next.js', 'Redux', 'Bootstrap', 'Spring Boot'],
+        'AI & Data Science': ['Machine Learning', 'Deep Learning', 'PyTorch', 'TensorFlow', 'NLP', 'Scikit-Learn', 'Pandas', 'NumPy', 'PyPDF', 'OpenCV', 'Data Analysis', 'Computer Vision'],
+        'Cloud & DevOps': ['AWS', 'Docker', 'Kubernetes', 'Git', 'GitHub', 'CI/CD', 'Linux', 'PostgreSQL', 'MySQL', 'MongoDB', 'Redis', 'Nginx', 'Firebase', 'Azure', 'GCP']
       };
 
       const extractedByCategory = {};
@@ -113,11 +147,42 @@ const parseResumeClientSide = async (file) => {
         certifications: certifications
       };
 
+      // Sync Profile and Skills in LocalStorage
+      try {
+        // Update Candidate Profile
+        const existingProfile = JSON.parse(localStorage.getItem('hireai_candidate_profile') || '{}');
+        const updatedProfile = {
+          ...existingProfile,
+          phone: phone !== '+1 (555) 234-5678' ? phone : existingProfile.phone || phone,
+          education: education[0] || existingProfile.education,
+          profile_completion: 98
+        };
+        localStorage.setItem('hireai_candidate_profile', JSON.stringify(updatedProfile));
+
+        // Update Candidate User
+        const savedUser = JSON.parse(localStorage.getItem('hireai_user') || '{}');
+        if (savedUser && candidateName !== 'Demo Candidate') {
+          savedUser.full_name = candidateName;
+          if (email !== 'candidate@hireai.com') savedUser.email = email;
+          localStorage.setItem('hireai_user', JSON.stringify(savedUser));
+        }
+
+        // Update Technical Skills Matrix
+        const updatedSkills = Array.from(allExtractedSkills).map((sk, idx) => ({
+          id: idx + 1,
+          skill_name: sk,
+          skill_level: idx < 3 ? 'Expert' : idx < 6 ? 'Advanced' : 'Intermediate'
+        }));
+        localStorage.setItem('hireai_skills', JSON.stringify(updatedSkills));
+
+      } catch (err) {
+        console.warn("Local state sync note:", err);
+      }
+
       resolve(parsedResume);
     };
 
     reader.onerror = () => {
-      // Fallback on read error
       const ext = file.name.split('.').pop().toLowerCase();
       resolve({
         id: Date.now(),
