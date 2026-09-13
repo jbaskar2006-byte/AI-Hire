@@ -103,62 +103,8 @@ const getMockResponse = (url, method, data) => {
   }
 
   if (lowerUrl.includes('/candidate/resume') && method === 'post') {
-    // Handle File Upload Fallback
-    const fileName = reqData?.name || 'Uploaded_Resume.pdf';
-    const ext = fileName.split('.').pop().toLowerCase();
-    
-    const newResume = {
-      id: Date.now(),
-      original_filename: fileName,
-      file_type: ext,
-      file_size: 1548576,
-      uploaded_at: new Date().toISOString(),
-      total_skills_count: 14,
-      personal_info: {
-        name: 'Demo Candidate',
-        email: 'candidate@hireai.com',
-        phone: '+1 (555) 234-5678'
-      },
-      skills_by_category: {
-        'Programming Languages': ['Python', 'JavaScript', 'TypeScript', 'SQL'],
-        'Frameworks & Libraries': ['React', 'FastAPI', 'TailwindCSS', 'Node.js'],
-        'AI & Machine Learning': ['Machine Learning', 'PyPDF', 'NLP', 'Scikit-Learn']
-      },
-      all_extracted_skills: ['Python', 'JavaScript', 'TypeScript', 'SQL', 'React', 'FastAPI', 'TailwindCSS', 'Node.js', 'Machine Learning', 'PyPDF', 'NLP', 'Scikit-Learn'],
-      education: [
-        'B.S. in Computer Science - State University (2020 - 2024)'
-      ],
-      experience: [
-        'Software Engineer at Tech Solutions Inc. (2024 - Present)'
-      ],
-      projects: [
-        'Automated AI Resume Parser & Candidate Match Engine'
-      ],
-      certifications: [
-        'AWS Certified Developer',
-        'TensorFlow Machine Learning Specialist'
-      ]
-    };
-
-    localStorage.setItem('hireai_latest_resume', JSON.stringify(newResume));
-
-    const existingHistory = JSON.parse(localStorage.getItem('hireai_resume_history') || '[]');
-    const historyItem = {
-      id: newResume.id,
-      original_filename: fileName,
-      file_type: ext,
-      file_size: 1548576,
-      extracted_skills_count: 14,
-      analysis_status: 'Completed',
-      uploaded_at: newResume.uploaded_at
-    };
-    localStorage.setItem('hireai_resume_history', JSON.stringify([historyItem, ...existingHistory]));
-
-    return {
-      status: 'success',
-      message: 'Resume uploaded and analyzed successfully!',
-      resume: newResume
-    };
+    // Pass offline signal so resumeService runs live client-side PDF/DOCX parsing on uploaded file
+    return { offline: true, message: 'Backend unavailable, client-side parsing required' };
   }
 
   // --- 3. CANDIDATE PROFILE ENDPOINTS ---
