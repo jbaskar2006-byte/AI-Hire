@@ -33,3 +33,7 @@ backend/.env
 Thumbs.db
 Desktop.ini
 .DS_Store
+
+# Uploads
+backend/uploads/*
+
