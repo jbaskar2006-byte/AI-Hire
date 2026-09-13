@@ -33,7 +33,7 @@ const extractRawPdfStrings = (arrayBuffer) => {
     const rawText = decoder.decode(arrayBuffer);
     const textChunks = [];
     
-    // Extract text inside PDF Tj or TJ string operators: (Text) Tj or [(Text)] TJ
+    // Extract text inside PDF Tj or TJ string operators
     const tjMatches = rawText.match(/\((.*?)\)\s*Tj/g) || [];
     for (const match of tjMatches) {
       const cleaned = match.replace(/\((.*?)\)\s*Tj/, '$1').trim();
@@ -42,7 +42,6 @@ const extractRawPdfStrings = (arrayBuffer) => {
       }
     }
 
-    // Extract text inside brackets TJ
     const arrayTjMatches = rawText.match(/\[(.*?)\]\s*TJ/g) || [];
     for (const match of arrayTjMatches) {
       const innerStrings = match.match(/\((.*?)\)/g) || [];
@@ -107,7 +106,6 @@ const extractTextFromDocx = async (file) => {
     const decoder = new TextDecoder('utf-8');
     const textContent = decoder.decode(arrayBuffer);
     
-    // DOCX XML stores body text inside <w:t> elements
     const matches = textContent.match(/<w:t[^>]*>(.*?)<\/w:t>/g) || [];
     if (matches.length > 0) {
       const extractedWords = matches.map(m => m.replace(/<w:t[^>]*>|<\/w:t>/g, '')).join(' ');
@@ -121,7 +119,7 @@ const extractTextFromDocx = async (file) => {
   return '';
 };
 
-// Client-Side AI Resume Parsing & Extraction Engine
+// Client-Side AI Resume Parsing & Feature Extraction Engine
 export const parseResumeClientSide = async (file) => {
   let fullText = '';
   const ext = file.name.split('.').pop().toLowerCase();
@@ -147,10 +145,9 @@ export const parseResumeClientSide = async (file) => {
     .map(l => l.replace(/[\t\r\v]/g, ' ').trim())
     .filter(Boolean);
 
-  // Filter line helper
   const cleanLines = rawLines.map(l => l.replace(/^[•\-\*\d\.\)]+\s*/, '').trim()).filter(Boolean);
 
-  // 1. Extract Email
+  // 1. Extract Candidate Email
   const emailMatch = fullText.match(/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/);
   const email = emailMatch ? emailMatch[0] : 'Not specified in resume';
 
@@ -158,7 +155,7 @@ export const parseResumeClientSide = async (file) => {
   const phoneMatch = fullText.match(/(\+?\d{1,4}[\s.-]?)?\(?\d{2,5}\)?[\s.-]?\d{3,5}[\s.-]?\d{3,5}/);
   const phone = phoneMatch ? phoneMatch[0] : 'Not specified in resume';
 
-  // 3. Extract LinkedIn & GitHub
+  // 3. Extract LinkedIn & GitHub Links
   const linkedinMatch = fullText.match(/(https?:\/\/)?(www\.)?linkedin\.com\/in\/[a-zA-Z0-9_-]+/i);
   const githubMatch = fullText.match(/(https?:\/\/)?(www\.)?github\.com\/[a-zA-Z0-9_-]+/i);
   const linkedin_url = linkedinMatch ? (linkedinMatch[0].startsWith('http') ? linkedinMatch[0] : `https://${linkedinMatch[0]}`) : '';
@@ -172,7 +169,6 @@ export const parseResumeClientSide = async (file) => {
     const wordCount = line.split(/\s+/).length;
 
     if (!isIgnored && !hasDigits && line.length >= 2 && line.length <= 45 && wordCount >= 1 && wordCount <= 4) {
-      // Capitalize cleanly
       candidateName = line
         .toLowerCase()
         .replace(/\b\w/g, char => char.toUpperCase());
@@ -180,7 +176,6 @@ export const parseResumeClientSide = async (file) => {
     }
   }
 
-  // Fallback candidate name from original file name
   if (!candidateName || candidateName.length < 2) {
     const nameFromFilename = file.name
       .replace(/\.[^/.]+$/, "")
@@ -199,7 +194,44 @@ export const parseResumeClientSide = async (file) => {
     candidateName = 'Uploaded Candidate';
   }
 
-  // 5. Tech Skills Dictionary (250+ Tech Keywords Across 6 Categories)
+  // 5. Extract Languages Known (Spoken / Natural Languages)
+  const naturalLanguagesDict = [
+    'English', 'Tamil', 'Hindi', 'Spanish', 'French', 'German', 'Japanese', 'Mandarin', 
+    'Chinese', 'Russian', 'Arabic', 'Portuguese', 'Italian', 'Korean', 'Telugu', 'Malayalam', 
+    'Kannada', 'Marathi', 'Gujarati', 'Bengali', 'Punjabi', 'Urdu'
+  ];
+  const extractedLanguages = new Set();
+
+  naturalLanguagesDict.forEach((lang) => {
+    const regex = new RegExp(`\\b${lang}\\b`, 'i');
+    if (regex.test(fullText)) {
+      extractedLanguages.add(lang);
+    }
+  });
+
+  // Dynamic Languages Section Parser
+  let inLangSection = false;
+  for (const line of cleanLines) {
+    if (/^(languages|languages\s+known|spoken\s+languages)/i.test(line)) {
+      inLangSection = true;
+      continue;
+    }
+    if (inLangSection && /^(education|experience|work|projects|skills|certifications|summary)/i.test(line)) {
+      inLangSection = false;
+    }
+    if (inLangSection) {
+      const items = line.split(/[,\|•;]/).map(t => t.trim()).filter(t => t.length >= 3 && t.length <= 20);
+      items.forEach(item => {
+        if (!/\d/.test(item)) {
+          extractedLanguages.add(item.charAt(0).toUpperCase() + item.slice(1));
+        }
+      });
+    }
+  }
+
+  const languagesKnownList = Array.from(extractedLanguages);
+
+  // 6. Comprehensive Technical Skills Dictionary (250+ Keywords Across 6 Categories)
   const techDict = {
     'Programming Languages': ['Python', 'JavaScript', 'TypeScript', 'Java', 'C++', 'C#', 'SQL', 'HTML', 'CSS', 'Go', 'Rust', 'PHP', 'Ruby', 'Swift', 'Kotlin', 'R', 'Scala', 'Dart', 'Shell', 'Bash'],
     'Frameworks & Libraries': ['React', 'Next.js', 'Redux', 'Vue', 'Angular', 'Svelte', 'TailwindCSS', 'Bootstrap', 'FastAPI', 'Node.js', 'Express', 'Django', 'Flask', 'Spring Boot', 'Laravel', 'Vite', 'jQuery'],
@@ -212,7 +244,6 @@ export const parseResumeClientSide = async (file) => {
   const extractedByCategory = {};
   const allExtractedSkills = new Set();
 
-  // Search tech terms in document text
   Object.entries(techDict).forEach(([category, skillsList]) => {
     const foundInCat = [];
     skillsList.forEach((skill) => {
@@ -235,7 +266,7 @@ export const parseResumeClientSide = async (file) => {
       inSkillsSection = true;
       continue;
     }
-    if (inSkillsSection && /^(education|experience|work|projects|certifications|summary|objective)/i.test(line)) {
+    if (inSkillsSection && /^(education|experience|work|projects|certifications|summary|languages)/i.test(line)) {
       inSkillsSection = false;
     }
     if (inSkillsSection) {
@@ -248,9 +279,10 @@ export const parseResumeClientSide = async (file) => {
     }
   }
 
-  // 6. Section Segmentation (Education, Experience, Projects, Certifications)
+  // 7. Section Segmentation (Education, Internships Done, Work Experience, Projects, Certifications)
   const sections = {
     education: [],
+    internships: [],
     experience: [],
     projects: [],
     certifications: []
@@ -261,16 +293,19 @@ export const parseResumeClientSide = async (file) => {
     if (/^(education|academic|qualifications|educational\s+background)/i.test(line)) {
       currentSection = 'education';
       continue;
-    } else if (/^(work\s+experience|experience|employment|work\s+history|professional\s+experience|internships)/i.test(line)) {
+    } else if (/^(internships|internship\s+experience|industrial\s+training|trainee)/i.test(line)) {
+      currentSection = 'internships';
+      continue;
+    } else if (/^(work\s+experience|experience|employment|work\s+history|professional\s+experience)/i.test(line)) {
       currentSection = 'experience';
       continue;
     } else if (/^(projects|key\s+projects|personal\s+projects|academic\s+projects)/i.test(line)) {
       currentSection = 'projects';
       continue;
-    } else if (/^(certifications|licenses|courses|achievements|accomplishments)/i.test(line)) {
+    } else if (/^(certifications|certificates|licenses|courses|achievements|accomplishments)/i.test(line)) {
       currentSection = 'certifications';
       continue;
-    } else if (/^(summary|objective|profile|about\s+me|skills)/i.test(line)) {
+    } else if (/^(summary|objective|profile|about\s+me|skills|languages)/i.test(line)) {
       currentSection = null;
     }
 
@@ -279,7 +314,14 @@ export const parseResumeClientSide = async (file) => {
     }
   }
 
-  // Fallback section regex if section headers were absent or formatted non-standardly
+  // Explicit Internship lines filter (if no dedicated section header was present)
+  if (sections.internships.length === 0) {
+    sections.internships = cleanLines.filter(l => 
+      /intern|internship|trainee|apprentice|industrial\s+training/i.test(l)
+    ).slice(0, 4);
+  }
+
+  // Fallback section matchers
   if (sections.education.length === 0) {
     sections.education = cleanLines.filter(l => 
       /bachelor|master|b\.s|b\.tech|m\.s|m\.tech|ph\.d|university|college|degree|institute|graduat|school|board|diploma/i.test(l)
@@ -288,7 +330,7 @@ export const parseResumeClientSide = async (file) => {
 
   if (sections.experience.length === 0) {
     sections.experience = cleanLines.filter(l => 
-      /engineer|developer|specialist|architect|intern|analyst|manager|lead|consultant|inc|ltd|corp|solutions|technologies|202|201/i.test(l)
+      /engineer|developer|specialist|architect|analyst|manager|lead|consultant|inc|ltd|corp|solutions|technologies|202|201/i.test(l)
     ).slice(0, 5);
   }
 
@@ -303,6 +345,41 @@ export const parseResumeClientSide = async (file) => {
       /certif|aws|azure|coursera|udemy|google|oracle|cisco|certified|specialization|certificate/i.test(l)
     ).slice(0, 4);
   }
+
+  const allSkillsList = Array.from(allExtractedSkills);
+
+  // 8. Dynamic AI Job & Internship Skill Matching
+  const targetRoles = [
+    {
+      title: 'Full-Stack AI Engineer',
+      required_skills: ['React', 'Python', 'FastAPI', 'TailwindCSS', 'SQL', 'Machine Learning']
+    },
+    {
+      title: 'Machine Learning & NLP Intern',
+      required_skills: ['Python', 'PyTorch', 'TensorFlow', 'NLP', 'PyPDF', 'Scikit-Learn']
+    },
+    {
+      title: 'Frontend Developer Intern (React)',
+      required_skills: ['React', 'JavaScript', 'TypeScript', 'TailwindCSS', 'HTML', 'CSS']
+    },
+    {
+      title: 'Backend Software Engineering Intern',
+      required_skills: ['Python', 'Node.js', 'FastAPI', 'PostgreSQL', 'SQL', 'Docker', 'REST API']
+    }
+  ];
+
+  const jobMatchMatrix = targetRoles.map(role => {
+    const matched = role.required_skills.filter(s => allSkillsList.some(sk => sk.toLowerCase() === s.toLowerCase()));
+    const missing = role.required_skills.filter(s => !allSkillsList.some(sk => sk.toLowerCase() === s.toLowerCase()));
+    const matchPercentage = Math.min(100, Math.round((matched.length / role.required_skills.length) * 100) + (matched.length > 0 ? 15 : 0));
+    
+    return {
+      role_title: role.title,
+      match_score: matchPercentage,
+      matched_skills: matched,
+      missing_skills: missing
+    };
+  });
 
   // Construct Final Parsed Resume Object
   const parsedResume = {
@@ -319,17 +396,19 @@ export const parseResumeClientSide = async (file) => {
       linkedin_url: linkedin_url,
       github_url: github_url
     },
+    languages_known: languagesKnownList.length > 0 ? languagesKnownList : ['English'],
     skills_by_category: extractedByCategory,
-    all_extracted_skills: Array.from(allExtractedSkills),
+    all_extracted_skills: allSkillsList,
     education: sections.education.length > 0 ? sections.education : ['Education details parsed from resume'],
+    internships: sections.internships.length > 0 ? sections.internships : ['No specific internship lines detected'],
     experience: sections.experience.length > 0 ? sections.experience : ['Work experience parsed from resume'],
     projects: sections.projects.length > 0 ? sections.projects : ['Project details parsed from resume'],
-    certifications: sections.certifications.length > 0 ? sections.certifications : ['Certifications parsed from resume']
+    certifications: sections.certifications.length > 0 ? sections.certifications : ['Certifications parsed from resume'],
+    job_match_matrix: jobMatchMatrix
   };
 
-  // Sync state to LocalStorage for candidate profile, skills, and session
+  // Sync state to LocalStorage for candidate profile, skills, and user session
   try {
-    // 1. Update Candidate Profile
     const existingProfile = JSON.parse(localStorage.getItem('hireai_candidate_profile') || '{}');
     const updatedProfile = {
       ...existingProfile,
@@ -337,11 +416,11 @@ export const parseResumeClientSide = async (file) => {
       education: sections.education[0] || existingProfile.education || 'Parsed from uploaded resume',
       linkedin_url: linkedin_url || existingProfile.linkedin_url || '',
       github_url: github_url || existingProfile.github_url || '',
+      languages_known: languagesKnownList,
       profile_completion: 98
     };
     localStorage.setItem('hireai_candidate_profile', JSON.stringify(updatedProfile));
 
-    // 2. Update Candidate User Session
     const savedUser = JSON.parse(localStorage.getItem('hireai_user') || '{}');
     if (savedUser) {
       savedUser.full_name = candidateName;
@@ -349,9 +428,8 @@ export const parseResumeClientSide = async (file) => {
       localStorage.setItem('hireai_user', JSON.stringify(savedUser));
     }
 
-    // 3. Update Technical Skills Matrix
     if (allExtractedSkills.size > 0) {
-      const updatedSkills = Array.from(allExtractedSkills).map((sk, idx) => ({
+      const updatedSkills = allSkillsList.map((sk, idx) => ({
         id: idx + 1,
         skill_name: sk,
         skill_level: idx < 4 ? 'Expert' : idx < 8 ? 'Advanced' : 'Intermediate'
@@ -378,7 +456,6 @@ export const uploadResume = async (file, onUploadProgress) => {
   // Live client-side AI text extraction on uploaded file
   const parsedResume = await parseResumeClientSide(file);
 
-  // Try calling backend API if live, but swallow errors / offline responses
   try {
     const formData = new FormData();
     formData.append('file', file);
@@ -388,7 +465,6 @@ export const uploadResume = async (file, onUploadProgress) => {
     });
 
     if (response.data && response.data.resume && !response.data.offline) {
-      // If live Python server returned real parsed resume
       localStorage.setItem('hireai_latest_resume', JSON.stringify(response.data.resume));
       return response.data;
     }
@@ -396,7 +472,6 @@ export const uploadResume = async (file, onUploadProgress) => {
     console.warn("Backend API offline or static mode, utilizing live in-browser AI parser result.");
   }
 
-  // Store client-parsed resume in LocalStorage
   localStorage.setItem('hireai_latest_resume', JSON.stringify(parsedResume));
 
   const existingHistory = JSON.parse(localStorage.getItem('hireai_resume_history') || '[]');

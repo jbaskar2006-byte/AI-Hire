@@ -16,7 +16,12 @@ import {
   Award, 
   Clock, 
   RefreshCw,
-  FileCheck
+  FileCheck,
+  Languages,
+  Target,
+  Globe,
+  Layers,
+  ChevronRight
 } from 'lucide-react';
 import { uploadResume, getLatestResume, getResumeHistory } from '../../services/resumeService';
 import { useAuth } from '../../context/AuthContext';
@@ -103,12 +108,11 @@ export default function Resume() {
         setUploadProgress(progress);
       });
 
-      setSuccessMessage("Resume uploaded and analyzed successfully! Profile skills updated.");
+      setSuccessMessage("Resume uploaded and analyzed successfully! Profile skills and features extracted.");
       if (res && res.resume) {
         setLatestResume(res.resume);
         setActiveTab('analysis');
       }
-      // Refresh history
       fetchResumeData();
     } catch (err) {
       console.error("Resume upload failed:", err);
@@ -175,13 +179,13 @@ export default function Resume() {
         <div className="relative z-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
           <div>
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/20 border border-blue-400/30 text-blue-200 text-xs font-semibold uppercase tracking-wider mb-3">
-              <Sparkles className="w-3.5 h-3.5" /> AI Resume Engine
+              <Sparkles className="w-3.5 h-3.5" /> AI Resume Feature Extraction Engine
             </div>
             <h1 className="text-3xl font-extrabold tracking-tight sm:text-4xl text-white">
-              Resume Analysis & Parser
+              AI Resume Analysis & Feature Extractor
             </h1>
             <p className="mt-2 text-blue-200 max-w-2xl text-sm sm:text-base">
-              Upload your latest resume to automatically parse skills, experience, education, and enhance your candidate profile completeness.
+              Upload your resume to extract candidate name, internships done, projects, certificates, education, languages known, tech skills, and job match alignment.
             </p>
           </div>
           <button
@@ -190,7 +194,7 @@ export default function Resume() {
             className="flex items-center gap-2 px-4 py-2 bg-white/10 hover:bg-white/20 text-white border border-white/20 rounded-xl text-sm font-medium transition backdrop-blur-md"
           >
             <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
-            Refresh
+            Refresh Analysis
           </button>
         </div>
       </div>
@@ -252,7 +256,7 @@ export default function Resume() {
           {uploading && (
             <div className="w-full max-w-md space-y-2 mt-4">
               <div className="flex justify-between text-xs text-blue-300 font-medium">
-                <span>Uploading & Parsing Resume...</span>
+                <span>Extracting Resume Features & Parsing Text...</span>
                 <span>{uploadProgress}%</span>
               </div>
               <div className="w-full bg-slate-800 rounded-full h-2.5 overflow-hidden border border-slate-700">
@@ -279,10 +283,10 @@ export default function Resume() {
             }`}
           >
             <BrainCircuit className="w-4 h-4" />
-            AI Resume Analysis
+            Extracted Features & Analysis
             {latestResume && (
               <span className="px-2 py-0.5 text-xs bg-blue-500/20 text-blue-300 rounded-full border border-blue-500/30">
-                Latest
+                Active
               </span>
             )}
           </button>
@@ -299,20 +303,20 @@ export default function Resume() {
           </button>
         </div>
 
-        {/* Tab 1: AI Analysis */}
+        {/* Tab 1: AI Analysis & Feature Extraction */}
         {activeTab === 'analysis' && (
           <div>
             {loading ? (
               <div className="p-12 text-center text-slate-400">
                 <RefreshCw className="w-8 h-8 animate-spin mx-auto text-blue-500 mb-3" />
-                Loading resume analysis...
+                Loading extracted resume features...
               </div>
             ) : !latestResume ? (
               <div className="p-12 border border-slate-800 rounded-2xl bg-slate-900/40 text-center">
                 <FileText className="w-12 h-12 text-slate-600 mx-auto mb-3" />
                 <h3 className="text-lg font-semibold text-white">No Resume Uploaded Yet</h3>
                 <p className="text-slate-400 text-sm max-w-md mx-auto mt-1 mb-4">
-                  Upload your resume above to get instant AI-extracted skills, education details, and section insights.
+                  Upload your resume above to extract name, internships done, projects, certificates, education, languages known, and skill matrix.
                 </p>
                 <button
                   onClick={() => fileInputRef.current?.click()}
@@ -323,7 +327,8 @@ export default function Resume() {
               </div>
             ) : (
               <div className="space-y-6">
-                {/* Resume File Overview Meta */}
+                
+                {/* 1. Resume Overview Header Meta */}
                 <div className="p-6 bg-slate-900/60 border border-slate-800 rounded-2xl flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
                   <div className="flex items-center gap-4">
                     <div className="p-3 bg-blue-500/10 text-blue-400 rounded-xl border border-blue-500/20">
@@ -347,13 +352,14 @@ export default function Resume() {
                   <div className="flex items-center gap-2 bg-slate-800/80 px-4 py-2 rounded-xl border border-slate-700">
                     <Sparkles className="w-4 h-4 text-amber-400" />
                     <span className="text-xs text-slate-300">
-                      Total Skills Extracted: <strong className="text-white text-sm">{latestResume.total_skills_count || 0}</strong>
+                      Extracted Skills: <strong className="text-white text-sm">{latestResume.total_skills_count || 0}</strong>
                     </span>
                   </div>
                 </div>
 
-                {/* Personal Information & Quick Stats */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                {/* 2. Extracted Personal Contact Info & Spoken Languages Known */}
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                  {/* Name */}
                   <div className="p-5 bg-slate-900/50 border border-slate-800 rounded-xl flex items-center gap-3">
                     <div className="p-2.5 bg-indigo-500/10 text-indigo-400 rounded-lg">
                       <User className="w-5 h-5" />
@@ -366,6 +372,7 @@ export default function Resume() {
                     </div>
                   </div>
 
+                  {/* Email */}
                   <div className="p-5 bg-slate-900/50 border border-slate-800 rounded-xl flex items-center gap-3">
                     <div className="p-2.5 bg-blue-500/10 text-blue-400 rounded-lg">
                       <Mail className="w-5 h-5" />
@@ -378,6 +385,7 @@ export default function Resume() {
                     </div>
                   </div>
 
+                  {/* Phone */}
                   <div className="p-5 bg-slate-900/50 border border-slate-800 rounded-xl flex items-center gap-3">
                     <div className="p-2.5 bg-emerald-500/10 text-emerald-400 rounded-lg">
                       <Phone className="w-5 h-5" />
@@ -385,17 +393,90 @@ export default function Resume() {
                     <div className="overflow-hidden">
                       <p className="text-xs text-slate-400">Extracted Phone</p>
                       <p className="text-sm font-semibold text-white truncate">
-                        {latestResume.personal_info?.phone || "Not specified in resume"}
+                        {latestResume.personal_info?.phone || "Not specified"}
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Languages Known */}
+                  <div className="p-5 bg-slate-900/50 border border-slate-800 rounded-xl flex items-center gap-3">
+                    <div className="p-2.5 bg-purple-500/10 text-purple-400 rounded-lg">
+                      <Languages className="w-5 h-5" />
+                    </div>
+                    <div className="overflow-hidden">
+                      <p className="text-xs text-slate-400">Languages Known</p>
+                      <p className="text-xs font-semibold text-white truncate">
+                        {latestResume.languages_known && latestResume.languages_known.length > 0 
+                          ? latestResume.languages_known.join(', ')
+                          : 'English'}
                       </p>
                     </div>
                   </div>
                 </div>
 
-                {/* Categorized Skills Section */}
+                {/* 3. AI Job & Internship Skill Alignment Matrix */}
+                {latestResume.job_match_matrix && (
+                  <div className="p-6 bg-slate-900/60 border border-slate-800 rounded-2xl space-y-4">
+                    <h3 className="text-lg font-semibold text-white flex items-center gap-2">
+                      <Target className="w-5 h-5 text-emerald-400" />
+                      Job & Internship Skill Matching Analysis
+                    </h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      {latestResume.job_match_matrix.map((item, idx) => (
+                        <div key={idx} className="p-4 bg-slate-800/40 border border-slate-700/50 rounded-xl space-y-3">
+                          <div className="flex items-center justify-between">
+                            <h4 className="text-xs font-bold text-white flex items-center gap-2">
+                              <span>{item.role_title}</span>
+                            </h4>
+                            <span className={`px-2.5 py-0.5 rounded-full text-xs font-bold ${
+                              item.match_score >= 80 ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30' :
+                              item.match_score >= 60 ? 'bg-blue-500/20 text-blue-400 border border-blue-500/30' :
+                              'bg-amber-500/20 text-amber-400 border border-amber-500/30'
+                            }`}>
+                              {item.match_score}% Match
+                            </span>
+                          </div>
+
+                          {/* Matched Skills Badges */}
+                          <div>
+                            <p className="text-[10px] text-slate-400 font-medium mb-1">Matched Skills:</p>
+                            <div className="flex flex-wrap gap-1.5">
+                              {item.matched_skills.length > 0 ? (
+                                item.matched_skills.map((sk, sIdx) => (
+                                  <span key={sIdx} className="px-2 py-0.5 bg-emerald-500/10 text-emerald-300 border border-emerald-500/30 rounded text-[11px] font-medium">
+                                    ✓ {sk}
+                                  </span>
+                                ))
+                              ) : (
+                                <span className="text-[11px] text-slate-500 italic">No direct matched skills yet</span>
+                              )}
+                            </div>
+                          </div>
+
+                          {/* Missing / Focus Skills */}
+                          {item.missing_skills.length > 0 && (
+                            <div>
+                              <p className="text-[10px] text-slate-400 font-medium mb-1">Recommended Skills to Add:</p>
+                              <div className="flex flex-wrap gap-1.5">
+                                {item.missing_skills.map((sk, mIdx) => (
+                                  <span key={mIdx} className="px-2 py-0.5 bg-purple-500/10 text-purple-300 border border-purple-500/30 rounded text-[11px] font-medium">
+                                    + {sk}
+                                  </span>
+                                ))}
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* 4. Categorized Skills Matrix */}
                 <div className="p-6 bg-slate-900/60 border border-slate-800 rounded-2xl space-y-4">
                   <h3 className="text-lg font-semibold text-white flex items-center gap-2">
                     <Code className="w-5 h-5 text-blue-400" />
-                    Extracted Skills Matrix
+                    Extracted Technical Skills Matrix
                   </h3>
 
                   {latestResume.skills_by_category && Object.keys(latestResume.skills_by_category).length > 0 ? (
@@ -431,28 +512,29 @@ export default function Resume() {
                       ))}
                     </div>
                   ) : (
-                    <p className="text-sm text-slate-400 italic">No specific technical skills identified in resume text.</p>
+                    <p className="text-sm text-slate-400 italic">No technical skills detected in resume text.</p>
                   )}
                 </div>
 
-                {/* Grid: Education & Experience */}
+                {/* 5. Internships Done & Work Experience */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  {/* Education */}
+                  {/* Internships Done */}
                   <div className="p-6 bg-slate-900/60 border border-slate-800 rounded-2xl space-y-3">
                     <h3 className="text-base font-semibold text-white flex items-center gap-2">
-                      <GraduationCap className="w-5 h-5 text-indigo-400" />
-                      Education
+                      <Sparkles className="w-5 h-5 text-amber-400" />
+                      Internships Done & Industrial Training
                     </h3>
-                    {latestResume.education && latestResume.education.length > 0 ? (
+                    {latestResume.internships && latestResume.internships.length > 0 && !latestResume.internships[0].includes('No specific') ? (
                       <ul className="space-y-2">
-                        {latestResume.education.map((edu, idx) => (
-                          <li key={idx} className="p-3 bg-slate-800/40 border border-slate-700/50 rounded-xl text-xs text-slate-200">
-                            {edu}
+                        {latestResume.internships.map((intern, idx) => (
+                          <li key={idx} className="p-3 bg-slate-800/40 border border-amber-500/20 rounded-xl text-xs text-slate-200 flex items-start gap-2">
+                            <span className="text-amber-400 font-bold">•</span>
+                            <span>{intern}</span>
                           </li>
                         ))}
                       </ul>
                     ) : (
-                      <p className="text-xs text-slate-400 italic">No explicit degree / education details detected.</p>
+                      <p className="text-xs text-slate-400 italic">No specific internship lines parsed from document.</p>
                     )}
                   </div>
 
@@ -476,13 +558,13 @@ export default function Resume() {
                   </div>
                 </div>
 
-                {/* Grid: Projects & Certifications */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {/* 6. Grid: Projects, Education & Certifications */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                   {/* Projects */}
                   <div className="p-6 bg-slate-900/60 border border-slate-800 rounded-2xl space-y-3">
                     <h3 className="text-base font-semibold text-white flex items-center gap-2">
                       <FolderGit2 className="w-5 h-5 text-purple-400" />
-                      Extracted Projects
+                      Projects Built
                     </h3>
                     {latestResume.projects && latestResume.projects.length > 0 ? (
                       <ul className="space-y-2">
@@ -497,11 +579,30 @@ export default function Resume() {
                     )}
                   </div>
 
+                  {/* Education */}
+                  <div className="p-6 bg-slate-900/60 border border-slate-800 rounded-2xl space-y-3">
+                    <h3 className="text-base font-semibold text-white flex items-center gap-2">
+                      <GraduationCap className="w-5 h-5 text-indigo-400" />
+                      Education & Degrees
+                    </h3>
+                    {latestResume.education && latestResume.education.length > 0 ? (
+                      <ul className="space-y-2">
+                        {latestResume.education.map((edu, idx) => (
+                          <li key={idx} className="p-3 bg-slate-800/40 border border-slate-700/50 rounded-xl text-xs text-slate-200">
+                            {edu}
+                          </li>
+                        ))}
+                      </ul>
+                    ) : (
+                      <p className="text-xs text-slate-400 italic">No education details detected.</p>
+                    )}
+                  </div>
+
                   {/* Certifications */}
                   <div className="p-6 bg-slate-900/60 border border-slate-800 rounded-2xl space-y-3">
                     <h3 className="text-base font-semibold text-white flex items-center gap-2">
                       <Award className="w-5 h-5 text-amber-400" />
-                      Certifications
+                      Certificates & Credentials
                     </h3>
                     {latestResume.certifications && latestResume.certifications.length > 0 ? (
                       <ul className="space-y-2">
@@ -512,10 +613,11 @@ export default function Resume() {
                         ))}
                       </ul>
                     ) : (
-                      <p className="text-xs text-slate-400 italic">No certifications found in resume text.</p>
+                      <p className="text-xs text-slate-400 italic">No certificates found in resume text.</p>
                     )}
                   </div>
                 </div>
+
               </div>
             )}
           </div>
