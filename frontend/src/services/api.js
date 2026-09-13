@@ -25,150 +25,323 @@ api.interceptors.request.use(
 const getMockResponse = (url, method, data) => {
   const lowerUrl = (url || '').toLowerCase();
 
-  if (lowerUrl.includes('/auth/me')) {
-    const saved = localStorage.getItem('hireai_user');
-    return saved ? JSON.parse(saved) : { id: 1, full_name: 'Demo User', email: 'demo@hireai.com', role: 'candidate' };
+  // Parse request body data if present
+  let reqData = {};
+  if (data) {
+    try {
+      reqData = typeof data === 'string' ? JSON.parse(data) : data;
+    } catch (e) {
+      reqData = {};
+    }
   }
 
+  // --- 1. AUTHENTICATION & USER ENDPOINTS ---
+  if (lowerUrl.includes('/auth/me')) {
+    const saved = localStorage.getItem('hireai_user');
+    return saved ? JSON.parse(saved) : { id: 1, full_name: 'Demo Candidate', email: 'candidate@hireai.com', role: 'candidate' };
+  }
+
+  // --- 2. CANDIDATE RESUME ANALYSIS ENDPOINTS ---
+  if (lowerUrl.includes('/candidate/resume/latest') || (lowerUrl.includes('/candidate/resume') && method === 'get' && !lowerUrl.includes('/history'))) {
+    const storedResume = localStorage.getItem('hireai_latest_resume');
+    if (storedResume) {
+      return { resume: JSON.parse(storedResume) };
+    }
+    const defaultResume = {
+      id: 1,
+      original_filename: 'Demo_Candidate_Resume.pdf',
+      file_type: 'pdf',
+      file_size: 1048576,
+      uploaded_at: new Date().toISOString(),
+      total_skills_count: 12,
+      personal_info: {
+        name: 'Demo Candidate',
+        email: 'candidate@hireai.com',
+        phone: '+1 (555) 234-5678'
+      },
+      skills_by_category: {
+        'Programming Languages': ['Python', 'JavaScript', 'TypeScript', 'SQL'],
+        'Frameworks & Libraries': ['React', 'FastAPI', 'Node.js', 'TailwindCSS'],
+        'AI & Data Processing': ['Machine Learning', 'PyPDF', 'NLP', 'Scikit-Learn']
+      },
+      all_extracted_skills: ['Python', 'JavaScript', 'TypeScript', 'SQL', 'React', 'FastAPI', 'Node.js', 'TailwindCSS', 'Machine Learning', 'PyPDF', 'NLP', 'Scikit-Learn'],
+      education: [
+        'B.S. in Computer Science - State University (2020 - 2024)'
+      ],
+      experience: [
+        'Senior Full-Stack & AI Engineer at Tech Solutions Inc. (2024 - Present)'
+      ],
+      projects: [
+        'HireAI Intelligent Recruitment & Candidate Scoring System',
+        'Automated Resume Extraction & Line-by-Line Skill Parser'
+      ],
+      certifications: [
+        'AWS Certified Solutions Architect',
+        'TensorFlow Machine Learning Specialist'
+      ]
+    };
+    return { resume: defaultResume };
+  }
+
+  if (lowerUrl.includes('/candidate/resume/history')) {
+    const storedHistory = localStorage.getItem('hireai_resume_history');
+    if (storedHistory) {
+      return { resumes: JSON.parse(storedHistory) };
+    }
+    const defaultHistory = [
+      {
+        id: 1,
+        original_filename: 'Demo_Candidate_Resume.pdf',
+        file_type: 'pdf',
+        file_size: 1048576,
+        extracted_skills_count: 12,
+        analysis_status: 'Completed',
+        uploaded_at: new Date().toISOString()
+      }
+    ];
+    return { resumes: defaultHistory };
+  }
+
+  if (lowerUrl.includes('/candidate/resume') && method === 'post') {
+    // Handle File Upload Fallback
+    const fileName = reqData?.name || 'Uploaded_Resume.pdf';
+    const ext = fileName.split('.').pop().toLowerCase();
+    
+    const newResume = {
+      id: Date.now(),
+      original_filename: fileName,
+      file_type: ext,
+      file_size: 1548576,
+      uploaded_at: new Date().toISOString(),
+      total_skills_count: 14,
+      personal_info: {
+        name: 'Demo Candidate',
+        email: 'candidate@hireai.com',
+        phone: '+1 (555) 234-5678'
+      },
+      skills_by_category: {
+        'Programming Languages': ['Python', 'JavaScript', 'TypeScript', 'SQL'],
+        'Frameworks & Libraries': ['React', 'FastAPI', 'TailwindCSS', 'Node.js'],
+        'AI & Machine Learning': ['Machine Learning', 'PyPDF', 'NLP', 'Scikit-Learn']
+      },
+      all_extracted_skills: ['Python', 'JavaScript', 'TypeScript', 'SQL', 'React', 'FastAPI', 'TailwindCSS', 'Node.js', 'Machine Learning', 'PyPDF', 'NLP', 'Scikit-Learn'],
+      education: [
+        'B.S. in Computer Science - State University (2020 - 2024)'
+      ],
+      experience: [
+        'Software Engineer at Tech Solutions Inc. (2024 - Present)'
+      ],
+      projects: [
+        'Automated AI Resume Parser & Candidate Match Engine'
+      ],
+      certifications: [
+        'AWS Certified Developer',
+        'TensorFlow Machine Learning Specialist'
+      ]
+    };
+
+    localStorage.setItem('hireai_latest_resume', JSON.stringify(newResume));
+
+    const existingHistory = JSON.parse(localStorage.getItem('hireai_resume_history') || '[]');
+    const historyItem = {
+      id: newResume.id,
+      original_filename: fileName,
+      file_type: ext,
+      file_size: 1548576,
+      extracted_skills_count: 14,
+      analysis_status: 'Completed',
+      uploaded_at: newResume.uploaded_at
+    };
+    localStorage.setItem('hireai_resume_history', JSON.stringify([historyItem, ...existingHistory]));
+
+    return {
+      status: 'success',
+      message: 'Resume uploaded and analyzed successfully!',
+      resume: newResume
+    };
+  }
+
+  // --- 3. CANDIDATE PROFILE ENDPOINTS ---
+  if (lowerUrl.includes('/candidate/profile')) {
+    if (method === 'put') {
+      const existing = JSON.parse(localStorage.getItem('hireai_candidate_profile') || '{}');
+      const updated = {
+        ...existing,
+        ...reqData,
+        profile_completion: 95
+      };
+      localStorage.setItem('hireai_candidate_profile', JSON.stringify(updated));
+      return updated;
+    }
+
+    const storedProfile = localStorage.getItem('hireai_candidate_profile');
+    if (storedProfile) {
+      return JSON.parse(storedProfile);
+    }
+    return {
+      phone: '+1 (555) 234-5678',
+      location: 'San Francisco, CA',
+      education: 'B.S. Computer Science, Stanford University',
+      experience_years: 5,
+      linkedin_url: 'https://linkedin.com/in/democandidate',
+      github_url: 'https://github.com/democandidate',
+      portfolio_url: 'https://democandidate.dev',
+      profile_completion: 92
+    };
+  }
+
+  // --- 4. CANDIDATE TECHNICAL SKILLS ENDPOINTS ---
+  if (lowerUrl.includes('/candidate/skills')) {
+    let storedSkills = JSON.parse(localStorage.getItem('hireai_skills') || 'null');
+    if (!storedSkills) {
+      storedSkills = [
+        { id: 1, skill_name: 'React', skill_level: 'Expert' },
+        { id: 2, skill_name: 'Python', skill_level: 'Advanced' },
+        { id: 3, skill_name: 'FastAPI', skill_level: 'Advanced' },
+        { id: 4, skill_name: 'SQL', skill_level: 'Intermediate' },
+        { id: 5, skill_name: 'TailwindCSS', skill_level: 'Expert' },
+        { id: 6, skill_name: 'Machine Learning', skill_level: 'Intermediate' }
+      ];
+      localStorage.setItem('hireai_skills', JSON.stringify(storedSkills));
+    }
+
+    if (method === 'post') {
+      const newSkill = {
+        id: Date.now(),
+        skill_name: reqData.skill_name || 'New Skill',
+        skill_level: reqData.skill_level || 'Intermediate'
+      };
+      storedSkills.push(newSkill);
+      localStorage.setItem('hireai_skills', JSON.stringify(storedSkills));
+      return newSkill;
+    }
+
+    if (method === 'put') {
+      const skillId = parseInt(lowerUrl.split('/').pop());
+      storedSkills = storedSkills.map(s => s.id === skillId ? { ...s, ...reqData } : s);
+      localStorage.setItem('hireai_skills', JSON.stringify(storedSkills));
+      return reqData;
+    }
+
+    if (method === 'delete') {
+      const skillId = parseInt(lowerUrl.split('/').pop());
+      storedSkills = storedSkills.filter(s => s.id !== skillId);
+      localStorage.setItem('hireai_skills', JSON.stringify(storedSkills));
+      return { status: 'success', message: 'Skill deleted' };
+    }
+
+    return storedSkills;
+  }
+
+  // --- 5. CANDIDATE APPLICATIONS ENDPOINTS ---
+  if (lowerUrl.includes('/applications') || lowerUrl.includes('/candidate/applications')) {
+    let storedApps = JSON.parse(localStorage.getItem('hireai_applications') || 'null');
+    if (!storedApps) {
+      storedApps = [
+        {
+          id: 501,
+          job_title: 'Senior Full-Stack AI Engineer',
+          company_name: 'TechCorp AI Labs',
+          status: 'Under Review',
+          applied_at: new Date().toISOString(),
+          match_score: 95.8
+        },
+        {
+          id: 502,
+          job_title: 'Machine Learning & NLP Specialist',
+          company_name: 'DataPulse Analytics',
+          status: 'Interview Scheduled',
+          applied_at: new Date().toISOString(),
+          match_score: 91.2
+        }
+      ];
+      localStorage.setItem('hireai_applications', JSON.stringify(storedApps));
+    }
+
+    if (method === 'post') {
+      const newApp = {
+        id: Date.now(),
+        job_title: 'Applied Position',
+        company_name: 'Tech Partner',
+        status: 'Submitted',
+        applied_at: new Date().toISOString(),
+        match_score: 92.5
+      };
+      storedApps.unshift(newApp);
+      localStorage.setItem('hireai_applications', JSON.stringify(storedApps));
+      return newApp;
+    }
+
+    return storedApps;
+  }
+
+  // --- 6. JOBS BOARD ENDPOINTS ---
   if (lowerUrl.includes('/jobs')) {
     const mockJobs = [
       {
         id: 101,
         title: 'Senior Full-Stack AI Engineer',
         company_name: 'TechCorp AI Labs',
+        company: { name: 'TechCorp AI Labs', industry: 'Artificial Intelligence', location: 'San Francisco, CA', website: 'https://techcorp.ai' },
         location: 'San Francisco, CA (Hybrid)',
         job_type: 'Full-Time',
         salary_range: '$140,000 - $180,000',
-        description: 'Lead development of next-generation AI hiring and candidate evaluation algorithms using React, Python FastAPI, and LLMs.',
+        salary_min: 140000,
+        salary_max: 180000,
+        min_experience: 3,
+        description: 'Lead development of next-generation AI hiring and candidate evaluation algorithms using React, Python FastAPI, and LLMs.\n\nKey Responsibilities:\n• Architect scalable web applications and state management systems.\n• Develop automated document extraction models & skill matching matrix.',
         requirements: 'React, Python, FastAPI, Machine Learning, PostgreSQL, Docker',
-        status: 'Active',
+        skills: [
+          { skill_name: 'React', skill_type: 'required' },
+          { skill_name: 'Python', skill_type: 'required' },
+          { skill_name: 'FastAPI', skill_type: 'required' },
+          { skill_name: 'Machine Learning', skill_type: 'preferred' }
+        ],
+        status: 'active',
+        applications_count: 42,
         created_at: new Date().toISOString()
       },
       {
         id: 102,
         title: 'Machine Learning & NLP Specialist',
         company_name: 'DataPulse Analytics',
+        company: { name: 'DataPulse Analytics', industry: 'Data Intelligence', location: 'Remote', website: 'https://datapulse.dev' },
         location: 'Remote',
         job_type: 'Full-Time',
         salary_range: '$130,000 - $165,000',
+        salary_min: 130000,
+        salary_max: 165000,
+        min_experience: 2,
         description: 'Design automated document extraction models, resume parsing pipelines, and skill similarity graph matching engines.',
         requirements: 'Python, PyTorch, Scikit-Learn, PyPDF, NLP, REST APIs',
-        status: 'Active',
-        created_at: new Date().toISOString()
-      },
-      {
-        id: 103,
-        title: 'Lead Frontend Developer (React)',
-        company_name: 'NextGen Softworks',
-        location: 'New York, NY (On-site)',
-        job_type: 'Full-Time',
-        salary_range: '$120,000 - $155,000',
-        description: 'Craft responsive, high-performance web applications with modern glassmorphism, dynamic data visualizations, and TailwindCSS.',
-        requirements: 'React, JavaScript (ES6+), Vite, TailwindCSS, Recharts, State Management',
-        status: 'Active',
+        skills: [
+          { skill_name: 'Python', skill_type: 'required' },
+          { skill_name: 'PyPDF', skill_type: 'required' },
+          { skill_name: 'Scikit-Learn', skill_type: 'preferred' }
+        ],
+        status: 'active',
+        applications_count: 28,
         created_at: new Date().toISOString()
       }
     ];
 
     if (method === 'get' && lowerUrl.match(/\/jobs\/\d+/)) {
-      return mockJobs[0];
+      const jobId = parseInt(lowerUrl.split('/').pop());
+      return mockJobs.find(j => j.id === jobId) || mockJobs[0];
     }
     return mockJobs;
   }
 
-  if (lowerUrl.includes('/candidate/profile')) {
+  // --- 7. AI MATCHING, RANKINGS, INTERVIEW PREP & RECS ---
+  if (lowerUrl.includes('/ai/calculate-match') || lowerUrl.includes('/ai/match')) {
     return {
-      full_name: 'Demo Candidate',
-      email: 'candidate@hireai.com',
-      phone: '+1 (555) 234-5678',
-      headline: 'Senior Software & AI Engineer',
-      summary: 'Passionate developer with 5+ years of experience building modern web apps, full-stack REST services, and AI data parsing pipelines.',
-      skills: ['React', 'Python', 'FastAPI', 'JavaScript', 'SQL', 'Machine Learning', 'TailwindCSS']
+      final_score: 95.8,
+      skill_score: 98,
+      experience_score: 92,
+      education_score: 95,
+      similarity_score: 94,
+      explanation: 'Exceptional skill overlap in React, Python, and AI Resume Parsing architecture.'
     };
-  }
-
-  if (lowerUrl.includes('/candidate/resume')) {
-    return {
-      id: 1,
-      filename: 'Candidate_Resume_Parsed.pdf',
-      upload_date: new Date().toISOString(),
-      parsed_data: {
-        contact_info: {
-          full_name: 'Demo Candidate',
-          email: 'candidate@hireai.com',
-          phone: '+1 (555) 234-5678',
-          linkedin: 'https://linkedin.com/in/democandidate',
-          github: 'https://github.com/democandidate'
-        },
-        skills: ['React', 'Python', 'FastAPI', 'JavaScript', 'SQL', 'PyPDF', 'TailwindCSS'],
-        education: [
-          { degree: 'B.S. in Computer Science', institution: 'State University', year: '2020 - 2024' }
-        ],
-        experience: [
-          { role: 'Software Engineer', company: 'Tech Solutions Inc.', duration: '2024 - Present', description: 'Developed full-stack web applications and automated AI data processing modules.' }
-        ],
-        certificates: ['AWS Certified Developer', 'TensorFlow Machine Learning Specialist'],
-        line_by_line_analysis: [
-          { section: 'Education', text: 'B.S. Computer Science - State University (2020-2024)', confidence: 0.98 },
-          { section: 'Skills', text: 'Languages: Python, JavaScript, SQL. Frameworks: React, FastAPI, TailwindCSS.', confidence: 0.99 },
-          { section: 'Experience', text: 'Software Engineer at Tech Solutions Inc: Implemented REST APIs and web interfaces.', confidence: 0.96 }
-        ]
-      }
-    };
-  }
-
-  if (lowerUrl.includes('/ai/analyze-resume')) {
-    return {
-      status: 'success',
-      match_score: 94.5,
-      candidate_name: 'Parsed Candidate Profile',
-      parsed_data: {
-        contact: { email: 'candidate@hireai.com', phone: '+1 (555) 234-5678' },
-        skills: ['React', 'Python', 'FastAPI', 'TailwindCSS', 'SQL', 'Machine Learning'],
-        education: ['B.S. Computer Science'],
-        experience: ['Software Engineer (2+ years)'],
-        certificates: ['AWS Certified Developer']
-      },
-      analysis_insights: [
-        'Strong alignment with Full-Stack and AI Engineering requirements.',
-        'Extracted verified education, certified skills, and line-by-line experience credentials.'
-      ]
-    };
-  }
-
-  if (lowerUrl.includes('/recruiter/profile') || lowerUrl.includes('/recruiter/company')) {
-    return {
-      full_name: 'Lead Recruiter',
-      email: 'recruiter@hireai.com',
-      company_name: 'TechCorp AI Labs',
-      industry: 'Artificial Intelligence & Software',
-      website: 'https://techcorp.ai'
-    };
-  }
-
-  if (lowerUrl.includes('/admin/stats')) {
-    return {
-      total_users: 1420,
-      active_jobs: 86,
-      total_applications: 3890,
-      match_accuracy: 96.4,
-      ai_parses_completed: 12450
-    };
-  }
-
-  if (lowerUrl.includes('/admin/users')) {
-    return [
-      { id: 1, full_name: 'Demo Candidate', email: 'candidate@hireai.com', role: 'candidate', is_active: true },
-      { id: 2, full_name: 'Lead Recruiter', email: 'recruiter@hireai.com', role: 'recruiter', is_active: true },
-      { id: 3, full_name: 'System Administrator', email: 'admin@hireai.com', role: 'admin', is_active: true }
-    ];
-  }
-
-  if (lowerUrl.includes('/admin/jobs')) {
-    return [
-      { id: 101, title: 'Senior Full-Stack AI Engineer', company_name: 'TechCorp AI Labs', status: 'Active', applications_count: 42 },
-      { id: 102, title: 'Machine Learning & NLP Specialist', company_name: 'DataPulse Analytics', status: 'Active', applications_count: 28 }
-    ];
   }
 
   if (lowerUrl.includes('/ai/rank-candidates')) {
@@ -203,6 +376,42 @@ const getMockResponse = (url, method, data) => {
     return [
       { id: 101, title: 'Senior Full-Stack AI Engineer', company_name: 'TechCorp AI Labs', match_score: 95.8 },
       { id: 102, title: 'Machine Learning & NLP Specialist', company_name: 'DataPulse Analytics', match_score: 91.2 }
+    ];
+  }
+
+  // --- 8. RECRUITER & ADMIN ENDPOINTS ---
+  if (lowerUrl.includes('/recruiter/profile') || lowerUrl.includes('/recruiter/company')) {
+    return {
+      full_name: 'Lead Recruiter',
+      email: 'recruiter@hireai.com',
+      company_name: 'TechCorp AI Labs',
+      industry: 'Artificial Intelligence & Software',
+      website: 'https://techcorp.ai'
+    };
+  }
+
+  if (lowerUrl.includes('/admin/stats')) {
+    return {
+      total_users: 1420,
+      active_jobs: 86,
+      total_applications: 3890,
+      match_accuracy: 96.4,
+      ai_parses_completed: 12450
+    };
+  }
+
+  if (lowerUrl.includes('/admin/users')) {
+    return [
+      { id: 1, full_name: 'Demo Candidate', email: 'candidate@hireai.com', role: 'candidate', is_active: true },
+      { id: 2, full_name: 'Lead Recruiter', email: 'recruiter@hireai.com', role: 'recruiter', is_active: true },
+      { id: 3, full_name: 'System Administrator', email: 'admin@hireai.com', role: 'admin', is_active: true }
+    ];
+  }
+
+  if (lowerUrl.includes('/admin/jobs')) {
+    return [
+      { id: 101, title: 'Senior Full-Stack AI Engineer', company_name: 'TechCorp AI Labs', status: 'Active', applications_count: 42 },
+      { id: 102, title: 'Machine Learning & NLP Specialist', company_name: 'DataPulse Analytics', status: 'Active', applications_count: 28 }
     ];
   }
 
