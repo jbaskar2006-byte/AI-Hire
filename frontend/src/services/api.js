@@ -21,6 +21,31 @@ api.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
+// Scoped LocalStorage Key Helper per Active User Identity
+export const getUserStorageKey = (baseKey) => {
+  try {
+    const savedUserStr = localStorage.getItem('hireai_user');
+    if (savedUserStr) {
+      const savedUser = JSON.parse(savedUserStr);
+      const identifier = savedUser?.email || savedUser?.id || 'default';
+      const sanitized = String(identifier).toLowerCase().replace(/[^a-z0-9]/g, '_');
+      const scopedKey = `${baseKey}_${sanitized}`;
+
+      // Migrate legacy un-scoped data for Baskar J if scoped key does not exist yet
+      if (!localStorage.getItem(scopedKey) && sanitized.includes('baskar')) {
+        const legacyData = localStorage.getItem(baseKey);
+        if (legacyData) {
+          localStorage.setItem(scopedKey, legacyData);
+        }
+      }
+      return scopedKey;
+    }
+  } catch (e) {
+    console.warn("Error resolving scoped storage key:", e);
+  }
+  return `${baseKey}_default`;
+};
+
 // Client-Side Mock Data Engine for Static Host Deployments (GitHub Pages / Offline)
 const getMockResponse = (url, method, data) => {
   const lowerUrl = (url || '').toLowerCase();
@@ -178,7 +203,7 @@ const getMockResponse = (url, method, data) => {
       company: { name: 'NeuralTech Solutions', industry: 'Artificial Intelligence', location: 'Remote / Bangalore', website: 'https://neuraltech.ai' },
       location: 'Remote / Hybrid',
       job_type: 'Full-Time',
-      salary_range: '₹10,00,000 - ₹15,00,000',
+      salary_range: '₹10,000,000 - ₹15,00,000',
       salary_min: 1000000,
       salary_max: 1500000,
       min_experience: 2,
@@ -264,12 +289,13 @@ const getMockResponse = (url, method, data) => {
   // 1. AUTHENTICATION
   if (lowerUrl.includes('/auth/me')) {
     const saved = localStorage.getItem('hireai_user');
-    return saved ? JSON.parse(saved) : { id: 1, full_name: 'Baskar J', email: 'Jbaskar2006@gmail.com', role: 'candidate' };
+    return saved ? JSON.parse(saved) : null;
   }
 
   // 2. RESUME ENDPOINTS
   if (lowerUrl.includes('/candidate/resume/latest') || (lowerUrl.includes('/candidate/resume') && method === 'get' && !lowerUrl.includes('/history'))) {
-    const storedResume = localStorage.getItem('hireai_latest_resume');
+    const key = getUserStorageKey('hireai_latest_resume');
+    const storedResume = localStorage.getItem(key);
     if (storedResume) {
       return { resume: JSON.parse(storedResume) };
     }
@@ -277,7 +303,8 @@ const getMockResponse = (url, method, data) => {
   }
 
   if (lowerUrl.includes('/candidate/resume/history')) {
-    const storedHistory = localStorage.getItem('hireai_resume_history');
+    const key = getUserStorageKey('hireai_resume_history');
+    const storedHistory = localStorage.getItem(key);
     if (storedHistory) {
       return { resumes: JSON.parse(storedHistory) };
     }
@@ -290,25 +317,34 @@ const getMockResponse = (url, method, data) => {
 
   // 3. APPLICATIONS ENDPOINTS
   if (lowerUrl.includes('/applications')) {
-    let storedApps = JSON.parse(localStorage.getItem('hireai_applications') || 'null');
-    if (!storedApps) {
-      storedApps = [
-        {
-          id: 501,
-          job_id: 101,
-          status: 'Applied',
-          applied_at: new Date().toISOString(),
-          job: baseJobs[0]
-        },
-        {
-          id: 502,
-          job_id: 102,
-          status: 'Under Review',
-          applied_at: new Date().toISOString(),
-          job: baseJobs[1]
-        }
-      ];
-      localStorage.setItem('hireai_applications', JSON.stringify(storedApps));
+    const key = getUserStorageKey('hireai_applications');
+    let storedApps = JSON.parse(localStorage.getItem(key) || 'null');
+    if (storedApps === null) {
+      const userStr = localStorage.getItem('hireai_user');
+      const userObj = userStr ? JSON.parse(userStr) : {};
+      const isBaskar = userObj.email && userObj.email.toLowerCase().includes('baskar');
+
+      if (isBaskar) {
+        storedApps = [
+          {
+            id: 501,
+            job_id: 101,
+            status: 'Applied',
+            applied_at: new Date().toISOString(),
+            job: baseJobs[0]
+          },
+          {
+            id: 502,
+            job_id: 102,
+            status: 'Under Review',
+            applied_at: new Date().toISOString(),
+            job: baseJobs[1]
+          }
+        ];
+      } else {
+        storedApps = [];
+      }
+      localStorage.setItem(key, JSON.stringify(storedApps));
     }
 
     if (method === 'post') {
@@ -329,7 +365,7 @@ const getMockResponse = (url, method, data) => {
           job: targetJob
         };
         storedApps.unshift(newApp);
-        localStorage.setItem('hireai_applications', JSON.stringify(storedApps));
+        localStorage.setItem(key, JSON.stringify(storedApps));
       }
       return { status: 'success', message: 'Application submitted successfully!', application: newApp };
     }
@@ -337,7 +373,7 @@ const getMockResponse = (url, method, data) => {
     if (method === 'delete') {
       const appId = parseInt(lowerUrl.split('/').pop());
       storedApps = storedApps.filter(a => a.id !== appId && a.job_id !== appId);
-      localStorage.setItem('hireai_applications', JSON.stringify(storedApps));
+      localStorage.setItem(key, JSON.stringify(storedApps));
       return { status: 'success', message: 'Application withdrawn successfully' };
     }
 
@@ -346,7 +382,8 @@ const getMockResponse = (url, method, data) => {
 
   // 4. JOBS BOARD ENDPOINTS
   if (lowerUrl.includes('/jobs')) {
-    const storedApps = JSON.parse(localStorage.getItem('hireai_applications') || '[]');
+    const key = getUserStorageKey('hireai_applications');
+    const storedApps = JSON.parse(localStorage.getItem(key) || '[]');
     const appliedJobIds = storedApps.map(a => a.job_id || a.job?.id);
 
     const jobsWithAppliedState = baseJobs.map(j => ({
@@ -371,7 +408,8 @@ const getMockResponse = (url, method, data) => {
 
   // 5. AI RECOMMENDATIONS ENDPOINTS
   if (lowerUrl.includes('/ai/recommend-jobs') || lowerUrl.includes('/ai/recommendations')) {
-    const storedApps = JSON.parse(localStorage.getItem('hireai_applications') || '[]');
+    const key = getUserStorageKey('hireai_applications');
+    const storedApps = JSON.parse(localStorage.getItem(key) || '[]');
     const appliedJobIds = storedApps.map(a => a.job_id || a.job?.id);
 
     const recommendations = baseJobs.slice(0, 6).map((j, idx) => ({
@@ -427,47 +465,83 @@ const getMockResponse = (url, method, data) => {
 
   // 7. CANDIDATE PROFILE ENDPOINTS
   if (lowerUrl.includes('/candidate/profile')) {
+    const key = getUserStorageKey('hireai_candidate_profile');
     if (method === 'put') {
-      const existing = JSON.parse(localStorage.getItem('hireai_candidate_profile') || '{}');
+      const existing = JSON.parse(localStorage.getItem(key) || '{}');
       const updated = {
         ...existing,
         ...reqData,
-        profile_completion: 98
+        profile_completion: reqData.profile_completion || 85
       };
-      localStorage.setItem('hireai_candidate_profile', JSON.stringify(updated));
+      localStorage.setItem(key, JSON.stringify(updated));
       return updated;
     }
 
-    const storedProfile = localStorage.getItem('hireai_candidate_profile');
+    const storedProfile = localStorage.getItem(key);
     if (storedProfile) {
       return JSON.parse(storedProfile);
     }
-    return {
-      phone: '+91 6381962678',
-      location: 'Chennai, Tamil Nadu',
-      education: 'B.Tech – Computer Science & Engineering, Rajalakshmi Institute of Technology',
-      experience_years: 1,
-      linkedin_url: 'https://linkedin.com/in/baskar-j-46b7bb32b',
-      github_url: 'https://github.com/jbaskar2006-byte',
+
+    const userStr = localStorage.getItem('hireai_user');
+    const userObj = userStr ? JSON.parse(userStr) : {};
+    const isBaskar = userObj.email && userObj.email.toLowerCase().includes('baskar');
+
+    if (isBaskar) {
+      const defaultBaskarProfile = {
+        full_name: userObj.full_name || 'Baskar J',
+        email: userObj.email || 'Jbaskar2006@gmail.com',
+        phone: '+91 6381962678',
+        location: 'Chennai, Tamil Nadu',
+        education: 'B.Tech – Computer Science & Engineering, Rajalakshmi Institute of Technology',
+        experience_years: 1,
+        linkedin_url: 'https://linkedin.com/in/baskar-j-46b7bb32b',
+        github_url: 'https://github.com/jbaskar2006-byte',
+        portfolio_url: '',
+        profile_completion: 98
+      };
+      localStorage.setItem(key, JSON.stringify(defaultBaskarProfile));
+      return defaultBaskarProfile;
+    }
+
+    const cleanInitialProfile = {
+      full_name: userObj.full_name || userObj.name || 'Candidate',
+      email: userObj.email || '',
+      phone: '',
+      location: '',
+      education: '',
+      experience_years: 0,
+      linkedin_url: '',
+      github_url: '',
       portfolio_url: '',
-      profile_completion: 98
+      profile_completion: 25
     };
+    localStorage.setItem(key, JSON.stringify(cleanInitialProfile));
+    return cleanInitialProfile;
   }
 
   // 8. TECHNICAL SKILLS ENDPOINTS
   if (lowerUrl.includes('/candidate/skills')) {
-    let storedSkills = JSON.parse(localStorage.getItem('hireai_skills') || 'null');
-    if (!storedSkills) {
-      storedSkills = [
-        { id: 1, skill_name: 'Python', skill_level: 'Expert' },
-        { id: 2, skill_name: 'JavaScript', skill_level: 'Expert' },
-        { id: 3, skill_name: 'React.js', skill_level: 'Advanced' },
-        { id: 4, skill_name: 'Node.js', skill_level: 'Advanced' },
-        { id: 5, skill_name: 'Express', skill_level: 'Advanced' },
-        { id: 6, skill_name: 'MySQL', skill_level: 'Intermediate' },
-        { id: 7, skill_name: 'MongoDB', skill_level: 'Intermediate' }
-      ];
-      localStorage.setItem('hireai_skills', JSON.stringify(storedSkills));
+    const key = getUserStorageKey('hireai_skills');
+    let storedSkills = JSON.parse(localStorage.getItem(key) || 'null');
+    if (storedSkills === null) {
+      const userStr = localStorage.getItem('hireai_user');
+      const userObj = userStr ? JSON.parse(userStr) : {};
+      const isBaskar = userObj.email && userObj.email.toLowerCase().includes('baskar');
+
+      if (isBaskar) {
+        storedSkills = [
+          { id: 1, skill_name: 'Python', skill_level: 'Expert' },
+          { id: 2, skill_name: 'JavaScript', skill_level: 'Expert' },
+          { id: 3, skill_name: 'React.js', skill_level: 'Advanced' },
+          { id: 4, skill_name: 'Node.js', skill_level: 'Advanced' },
+          { id: 5, skill_name: 'Express', skill_level: 'Advanced' },
+          { id: 6, skill_name: 'MySQL', skill_level: 'Intermediate' },
+          { id: 7, skill_name: 'MongoDB', skill_level: 'Intermediate' }
+        ];
+      } else {
+        storedSkills = [];
+      }
+      localStorage.setItem(key, JSON.stringify(storedSkills));
     }
 
     if (method === 'post') {
@@ -477,14 +551,14 @@ const getMockResponse = (url, method, data) => {
         skill_level: reqData.skill_level || 'Intermediate'
       };
       storedSkills.push(newSkill);
-      localStorage.setItem('hireai_skills', JSON.stringify(storedSkills));
+      localStorage.setItem(key, JSON.stringify(storedSkills));
       return newSkill;
     }
 
     if (method === 'delete') {
       const skillId = parseInt(lowerUrl.split('/').pop());
       storedSkills = storedSkills.filter(s => s.id !== skillId);
-      localStorage.setItem('hireai_skills', JSON.stringify(storedSkills));
+      localStorage.setItem(key, JSON.stringify(storedSkills));
       return { status: 'success', message: 'Skill deleted' };
     }
 

@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import candidateService from '../../services/candidateService';
+import { getLatestResume } from '../../services/resumeService';
+import { getMyApplications } from '../../services/applicationService';
 import { 
   LayoutDashboard, 
   User as UserIcon, 
@@ -28,6 +30,9 @@ export const CandidateDashboard = () => {
   const navigate = useNavigate();
 
   const [profileData, setProfileData] = useState(null);
+  const [skillsList, setSkillsList] = useState([]);
+  const [hasResume, setHasResume] = useState(false);
+  const [applicationsList, setApplicationsList] = useState([]);
   const [loading, setLoading] = useState(true);
   const [comingSoonModal, setComingSoonModal] = useState(null);
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
@@ -35,8 +40,17 @@ export const CandidateDashboard = () => {
   useEffect(() => {
     const fetchCandidateData = async () => {
       try {
-        const data = await candidateService.getProfile();
-        setProfileData(data);
+        const [prof, sks, resData, apps] = await Promise.all([
+          candidateService.getProfile().catch(() => null),
+          candidateService.getSkills().catch(() => []),
+          getLatestResume().catch(() => ({ resume: null })),
+          getMyApplications().catch(() => [])
+        ]);
+
+        setProfileData(prof);
+        setSkillsList(sks || []);
+        setHasResume(!!(resData && resData.resume));
+        setApplicationsList(apps || []);
       } catch (err) {
         console.error('Failed to load candidate profile data:', err);
       } finally {
@@ -45,7 +59,7 @@ export const CandidateDashboard = () => {
     };
 
     fetchCandidateData();
-  }, []);
+  }, [user]);
 
   const sidebarNavItems = [
     { label: 'Dashboard', path: '/candidate/dashboard', icon: <LayoutDashboard className="w-4 h-4" />, active: true },
@@ -69,8 +83,9 @@ export const CandidateDashboard = () => {
     }
   };
 
-  const completionPct = profileData?.profile_completion || 0;
-  const skillsCount = profileData?.skills?.length || 0;
+  const completionPct = profileData?.profile_completion || (user ? 25 : 0);
+  const skillsCount = skillsList.length;
+  const applicationsCount = applicationsList.length;
   const userName = user?.name || user?.full_name || 'Candidate';
 
   return (
@@ -270,25 +285,26 @@ export const CandidateDashboard = () => {
                   <FileText className="w-4 h-4" />
                 </div>
               </div>
-              <p className="text-2xl font-bold text-white mt-4">AI Analyzed</p>
-              <p className="text-xs text-slate-400 mt-2">Upload & parse resume</p>
+              <p className="text-2xl font-bold text-white mt-4">{hasResume ? 'AI Analyzed' : 'Not Uploaded'}</p>
+              <p className="text-xs text-slate-400 mt-2">{hasResume ? 'Parsed & Extracted' : 'Upload resume to extract details'}</p>
               <Link to="/candidate/resume" className="text-xs font-bold text-purple-400 hover:text-purple-300 mt-4 inline-flex items-center gap-1">
-                Upload & View <ChevronRight className="w-3.5 h-3.5" />
+                {hasResume ? 'View Extracted Resume' : 'Upload Resume'} <ChevronRight className="w-3.5 h-3.5" />
               </Link>
             </div>
 
             {/* Card 4: Applications */}
-            <div className="bg-slate-900/60 backdrop-blur-md p-6 rounded-3xl border border-slate-800">
+            <div className="bg-slate-900/60 backdrop-blur-md p-6 rounded-3xl border border-slate-800 hover:border-amber-500/40 transition-all">
               <div className="flex items-center justify-between">
                 <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Applications</span>
                 <div className="w-8 h-8 rounded-xl bg-amber-500/10 text-amber-400 flex items-center justify-center">
                   <Briefcase className="w-4 h-4" />
                 </div>
               </div>
-              <p className="text-3xl font-extrabold text-white mt-4">0</p>
-              <span className="mt-2 inline-block px-2.5 py-0.5 rounded-md bg-slate-800 text-[10px] font-mono text-slate-400">
-                Coming Soon
-              </span>
+              <p className="text-3xl font-extrabold text-white mt-4">{applicationsCount}</p>
+              <p className="text-xs text-slate-400 mt-2">Submitted job requisitions</p>
+              <Link to="/candidate/applications" className="text-xs font-bold text-amber-400 hover:text-amber-300 mt-4 inline-flex items-center gap-1">
+                View Applications <ChevronRight className="w-3.5 h-3.5" />
+              </Link>
             </div>
 
           </div>

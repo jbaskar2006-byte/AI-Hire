@@ -1,4 +1,4 @@
-import api from './api';
+import api, { getUserStorageKey } from './api';
 
 // Helper to dynamically ensure PDF.js is loaded
 const ensurePdfJsLoaded = async () => {
@@ -170,19 +170,23 @@ export const parseResumeClientSide = async (file) => {
     });
   }
 
+  // Get active session user
+  const savedUser = JSON.parse(localStorage.getItem('hireai_user') || '{}');
+  const isBaskarUser = savedUser.email && savedUser.email.toLowerCase().includes('baskar');
+
   // 1. Extract Candidate Email
   const emailMatch = fullText.match(/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/);
-  const email = emailMatch ? emailMatch[0] : 'Jbaskar2006@gmail.com';
+  const email = emailMatch ? emailMatch[0] : (savedUser.email || (isBaskarUser ? 'Jbaskar2006@gmail.com' : ''));
 
   // 2. Extract Phone Number
   const phoneMatch = fullText.match(/(\+?\d{1,4}[\s.-]?)?\(?\d{2,5}\)?[\s.-]?\d{3,5}[\s.-]?\d{3,5}/);
-  const phone = phoneMatch ? phoneMatch[0] : '+91 6381962678';
+  const phone = phoneMatch ? phoneMatch[0] : (isBaskarUser ? '+91 6381962678' : '');
 
   // 3. Extract LinkedIn & GitHub Links
   const linkedinMatch = fullText.match(/(https?:\/\/)?(www\.)?linkedin\.com\/in\/[a-zA-Z0-9_-]+/i);
   const githubMatch = fullText.match(/(https?:\/\/)?(www\.)?github\.com\/[a-zA-Z0-9_-]+/i);
-  const linkedin_url = linkedinMatch ? (linkedinMatch[0].startsWith('http') ? linkedinMatch[0] : `https://${linkedinMatch[0]}`) : 'https://linkedin.com/in/baskar-j-46b7bb32b';
-  const github_url = githubMatch ? (githubMatch[0].startsWith('http') ? githubMatch[0] : `https://${githubMatch[0]}`) : 'https://github.com/jbaskar2006-byte';
+  const linkedin_url = linkedinMatch ? (linkedinMatch[0].startsWith('http') ? linkedinMatch[0] : `https://${linkedinMatch[0]}`) : (isBaskarUser ? 'https://linkedin.com/in/baskar-j-46b7bb32b' : '');
+  const github_url = githubMatch ? (githubMatch[0].startsWith('http') ? githubMatch[0] : `https://${githubMatch[0]}`) : (isBaskarUser ? 'https://github.com/jbaskar2006-byte' : '');
 
   // 4. Extract Clean Candidate Name
   let candidateName = '';
@@ -207,7 +211,7 @@ export const parseResumeClientSide = async (file) => {
   }
 
   if (!candidateName) {
-    candidateName = 'Baskar J';
+    candidateName = savedUser.full_name || savedUser.name || (isBaskarUser ? 'Baskar J' : 'Candidate');
   }
 
   // 5. Extract Languages Known
@@ -308,7 +312,7 @@ export const parseResumeClientSide = async (file) => {
     }
   }
 
-  if (cleanEducation.length === 0) {
+  if (cleanEducation.length === 0 && isBaskarUser) {
     cleanEducation = [
       'B.Tech – Computer Science & Engineering | Rajalakshmi Institute of Technology | CGPA: 8.87 / 10',
       "Class XII | CSI St. Hilda's & St. Hugh's Matric Hr Sec School | 2024 (93.3%)",
@@ -338,7 +342,7 @@ export const parseResumeClientSide = async (file) => {
     }
   }
 
-  if (cleanProjects.length === 0) {
+  if (cleanProjects.length === 0 && isBaskarUser) {
     cleanProjects = [
       'Smart AI Retail Analytics System with Multi-Store Management',
       'Real-Time Data Analysis Using Firebase',
@@ -367,7 +371,7 @@ export const parseResumeClientSide = async (file) => {
     }
   }
 
-  if (cleanInternships.length === 0) {
+  if (cleanInternships.length === 0 && isBaskarUser) {
     cleanInternships = [
       'Python Development Intern',
       'Data Science Virtual Intern'
@@ -387,7 +391,7 @@ export const parseResumeClientSide = async (file) => {
     }
   }
 
-  if (cleanCertificates.length === 0) {
+  if (cleanCertificates.length === 0 && isBaskarUser) {
     cleanCertificates = [
       'Maintained a strong academic record with a CGPA of 8.87/10 in B.Tech CSE',
       'Completed two structured internships in Python Development and Data Science'
@@ -454,33 +458,28 @@ export const parseResumeClientSide = async (file) => {
     job_match_matrix: jobMatchMatrix
   };
 
-  // Sync state to LocalStorage for candidate profile, skills, and user session
+  // Sync state to LocalStorage for candidate profile and skills matrix
   try {
-    const existingProfile = JSON.parse(localStorage.getItem('hireai_candidate_profile') || '{}');
+    const profileKey = getUserStorageKey('hireai_candidate_profile');
+    const existingProfile = JSON.parse(localStorage.getItem(profileKey) || '{}');
     const updatedProfile = {
       ...existingProfile,
-      phone: parsedResume.personal_info.phone,
-      education: cleanEducation[0] || 'B.Tech - Computer Science & Engineering',
-      linkedin_url: parsedResume.personal_info.linkedin_url,
-      github_url: parsedResume.personal_info.github_url,
+      phone: parsedResume.personal_info.phone || existingProfile.phone || '',
+      education: cleanEducation[0] || existingProfile.education || '',
+      linkedin_url: parsedResume.personal_info.linkedin_url || existingProfile.linkedin_url || '',
+      github_url: parsedResume.personal_info.github_url || existingProfile.github_url || '',
       languages_known: languagesKnownList,
-      profile_completion: 98
+      profile_completion: 95
     };
-    localStorage.setItem('hireai_candidate_profile', JSON.stringify(updatedProfile));
+    localStorage.setItem(profileKey, JSON.stringify(updatedProfile));
 
-    const savedUser = JSON.parse(localStorage.getItem('hireai_user') || '{}');
-    if (savedUser) {
-      savedUser.full_name = candidateName;
-      savedUser.email = parsedResume.personal_info.email;
-      localStorage.setItem('hireai_user', JSON.stringify(savedUser));
-    }
-
+    const skillsKey = getUserStorageKey('hireai_skills');
     const updatedSkills = parsedResume.all_extracted_skills.map((sk, idx) => ({
       id: idx + 1,
       skill_name: sk,
       skill_level: idx < 4 ? 'Expert' : idx < 8 ? 'Advanced' : 'Intermediate'
     }));
-    localStorage.setItem('hireai_skills', JSON.stringify(updatedSkills));
+    localStorage.setItem(skillsKey, JSON.stringify(updatedSkills));
 
   } catch (err) {
     console.warn("Local state sync note:", err);
@@ -499,6 +498,8 @@ export const uploadResume = async (file, onUploadProgress) => {
   }
 
   const parsedResume = await parseResumeClientSide(file);
+  const latestKey = getUserStorageKey('hireai_latest_resume');
+  const historyKey = getUserStorageKey('hireai_resume_history');
 
   try {
     const formData = new FormData();
@@ -509,16 +510,16 @@ export const uploadResume = async (file, onUploadProgress) => {
     });
 
     if (response.data && response.data.resume && !response.data.offline) {
-      localStorage.setItem('hireai_latest_resume', JSON.stringify(response.data.resume));
+      localStorage.setItem(latestKey, JSON.stringify(response.data.resume));
       return response.data;
     }
   } catch (err) {
     console.warn("Backend API offline or static mode, utilizing clean client-side AI parser result.");
   }
 
-  localStorage.setItem('hireai_latest_resume', JSON.stringify(parsedResume));
+  localStorage.setItem(latestKey, JSON.stringify(parsedResume));
 
-  const existingHistory = JSON.parse(localStorage.getItem('hireai_resume_history') || '[]');
+  const existingHistory = JSON.parse(localStorage.getItem(historyKey) || '[]');
   const historyItem = {
     id: parsedResume.id,
     original_filename: parsedResume.original_filename,
@@ -528,7 +529,7 @@ export const uploadResume = async (file, onUploadProgress) => {
     analysis_status: 'Completed',
     uploaded_at: parsedResume.uploaded_at
   };
-  localStorage.setItem('hireai_resume_history', JSON.stringify([historyItem, ...existingHistory]));
+  localStorage.setItem(historyKey, JSON.stringify([historyItem, ...existingHistory]));
 
   return {
     status: 'success',
@@ -547,7 +548,8 @@ export const getLatestResume = async () => {
     console.warn("Backend API unavailable for getLatestResume, using client storage.");
   }
 
-  const stored = localStorage.getItem('hireai_latest_resume');
+  const latestKey = getUserStorageKey('hireai_latest_resume');
+  const stored = localStorage.getItem(latestKey);
   if (stored) {
     return { resume: JSON.parse(stored) };
   }
@@ -565,7 +567,8 @@ export const getResumeHistory = async () => {
     console.warn("Backend API unavailable for getResumeHistory, using client storage.");
   }
 
-  const storedHistory = localStorage.getItem('hireai_resume_history');
+  const historyKey = getUserStorageKey('hireai_resume_history');
+  const storedHistory = localStorage.getItem(historyKey);
   if (storedHistory) {
     return { resumes: JSON.parse(storedHistory) };
   }

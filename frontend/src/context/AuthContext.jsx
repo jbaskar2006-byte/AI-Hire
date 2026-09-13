@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import api from '../services/api';
+import api, { getUserStorageKey } from '../services/api';
 
 const AuthContext = createContext(null);
 
@@ -18,6 +18,30 @@ export const AuthProvider = ({ children }) => {
     setTimeout(() => setToast(null), 4000);
   };
 
+  const initCandidateProfileIfNeeded = (userData) => {
+    if (userData && (userData.role === 'candidate' || !userData.role)) {
+      const key = getUserStorageKey('hireai_candidate_profile');
+      if (!localStorage.getItem(key)) {
+        const isBaskar = userData.email && userData.email.toLowerCase().includes('baskar');
+        if (!isBaskar) {
+          const cleanProfile = {
+            full_name: userData.full_name || 'Candidate',
+            email: userData.email,
+            phone: '',
+            location: '',
+            education: '',
+            experience_years: 0,
+            linkedin_url: '',
+            github_url: '',
+            portfolio_url: '',
+            profile_completion: 25
+          };
+          localStorage.setItem(key, JSON.stringify(cleanProfile));
+        }
+      }
+    }
+  };
+
   // Verify stored token on initial render
   useEffect(() => {
     const initAuth = async () => {
@@ -26,12 +50,17 @@ export const AuthProvider = ({ children }) => {
       if (storedToken && savedUser) {
         try {
           const res = await api.get('/auth/me');
-          setUser(res.data);
-          localStorage.setItem('hireai_user', JSON.stringify(res.data));
+          if (res.data) {
+            setUser(res.data);
+            localStorage.setItem('hireai_user', JSON.stringify(res.data));
+            initCandidateProfileIfNeeded(res.data);
+          }
         } catch (err) {
           console.warn('Backend offline or unreachable, using local session state.');
           try {
-            setUser(JSON.parse(savedUser));
+            const parsed = JSON.parse(savedUser);
+            setUser(parsed);
+            initCandidateProfileIfNeeded(parsed);
           } catch (e) {
             logout();
           }
@@ -79,6 +108,7 @@ export const AuthProvider = ({ children }) => {
       setUser(userData);
       localStorage.setItem('hireai_token', access_token);
       localStorage.setItem('hireai_user', JSON.stringify(userData));
+      initCandidateProfileIfNeeded(userData);
 
       showToast(`Welcome back, ${userData.full_name}!`, 'success');
       return { success: true, user: userData };
@@ -115,6 +145,7 @@ export const AuthProvider = ({ children }) => {
       setUser(mockUser);
       localStorage.setItem('hireai_token', mockToken);
       localStorage.setItem('hireai_user', JSON.stringify(mockUser));
+      initCandidateProfileIfNeeded(mockUser);
 
       showToast(`Welcome back, ${fullName}! (Demo Mode)`, 'success');
       return { success: true, user: mockUser };
@@ -131,6 +162,7 @@ export const AuthProvider = ({ children }) => {
       setUser(userData);
       localStorage.setItem('hireai_token', access_token);
       localStorage.setItem('hireai_user', JSON.stringify(userData));
+      initCandidateProfileIfNeeded(userData);
 
       showToast(`Account created successfully! Welcome to HireAI, ${userData.full_name}.`, 'success');
       return { success: true, user: userData };
@@ -150,6 +182,7 @@ export const AuthProvider = ({ children }) => {
       setUser(mockUser);
       localStorage.setItem('hireai_token', mockToken);
       localStorage.setItem('hireai_user', JSON.stringify(mockUser));
+      initCandidateProfileIfNeeded(mockUser);
 
       showToast(`Account created! Welcome to HireAI, ${mockUser.full_name}.`, 'success');
       return { success: true, user: mockUser };
